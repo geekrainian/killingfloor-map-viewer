@@ -5,3 +5,9 @@
 allowBuilds:
   electron: true
   electron-winstaller: true
+
+# Disable pnpm 11's minimum-release-age supply-chain gate for this repo. CI runs
+# `pnpm install --frozen-lockfile`, which installs the exact integrity-hashed
+# versions from pnpm-lock.yaml with no fresh resolution — the age gate only blocks
+# our own pinned electron (freshly published) without adding security here.
+minimumReleaseAge: 0
