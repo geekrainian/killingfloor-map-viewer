@@ -2,7 +2,7 @@
   "name": "killingfloor-map-viewer",
   "productName": "Killing Floor Map Viewer",
   "version": "0.1.0",
-  "description": "In-browser and desktop viewer for Killing Floor (.rom) maps",
+  "description": "A desktop app for viewing Killing Floor game maps (*.rom, Unreal Engine 2.5)",
   "author": "geekrainian (https://github.com/geekrainian)",
   "license": "MIT",
   "packageManager": "pnpm@11.13.0",
