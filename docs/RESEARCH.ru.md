@@ -1,6 +1,6 @@
 # Формат карт Killing Floor
 
-[English](./RESEARCH.md) · **Русский**
+[English](../RESEARCH.md) · **Русский** · [Español](./RESEARCH.es.md) · [Português](./RESEARCH.pt.md) · [Lietuvių](./RESEARCH.lt.md) · [Polski](./RESEARCH.pl.md) · [Français](./RESEARCH.fr.md) · [中文](./RESEARCH.zh.md) · [日本語](./RESEARCH.ja.md)
 
 Это мои заметки о том, как я разбирал формат карт Killing Floor — ровно настолько, чтобы нарисовать их в браузере. KFEd (официальный редактор) карту открыть умеет, но он тяжёлый и неуклюжий, если всё, что тебе нужно, — это полетать и посмотреть, поэтому я вместо него написал небольшой WebGL-просмотрщик. Всё здесь — Unreal Engine 2.5: карты это пакеты `.rom`, текстуры — `.utx`, статик-меши — `.usx`, всё один и тот же контейнерный формат.
 

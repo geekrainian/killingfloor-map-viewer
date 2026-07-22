@@ -1,10 +1,10 @@
 # Killing Floor Map Viewer
 
-[English](./README.md) · **Русский**
+[English](../README.md) · **Русский** · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
 Небольшой браузерный просмотрщик карт Killing Floor (`*.rom`, Unreal Engine 2.5). Рисует мир с текстурами и позволяет летать по нему свободной камерой — без запуска тяжёлого редактора KFEd. Формат `.rom` я разобрал вручную; подробности — в [`RESEARCH.ru.md`](./RESEARCH.ru.md).
 
-![Killing Floor Map Viewer](screenshot.jpg)
+![Killing Floor Map Viewer](../screenshot.jpg)
 
 ## Что нужно
 
@@ -48,7 +48,7 @@ node cli.js <map.rom> out.obj    # + export the BSP as OBJ (opens in Blender / W
 
 ## Лицензия
 
-Проект распространяется под лицензией **MIT**. Полный текст — в [`LICENSE`](./LICENSE).
+Проект распространяется под лицензией **MIT**. Полный текст — в [`LICENSE`](../LICENSE).
 
 ### Сторонние компоненты
 
