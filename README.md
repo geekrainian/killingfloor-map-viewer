@@ -1,5 +1,7 @@
 # Killing Floor Map Viewer
 
+**English** · [Русский](./README.ru.md)
+
 A small in-browser viewer for Killing Floor maps (`*.rom`, Unreal Engine 2.5). It draws the world with textures and lets you fly around, without opening the heavy KFEd editor. I worked the `.rom` format out by hand; the details are in [`RESEARCH.md`](./RESEARCH.md).
 
 ![Killing Floor Map Viewer](screenshot.jpg)

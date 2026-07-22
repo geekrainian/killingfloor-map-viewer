@@ -1,5 +1,7 @@
 # The Killing Floor map format
 
+**English** · [Русский](./RESEARCH.ru.md)
+
 These are my notes from working out the Killing Floor map format well enough to draw it in a browser. KFEd (the official editor) can open a map, but it is heavy and clumsy if all you want is to fly around and look, so I wrote a small WebGL viewer instead. Everything here is Unreal Engine 2.5: maps are `.rom` packages, textures are `.utx`, static meshes are `.usx`, all the same container format.
 
 The short version of what I found:
