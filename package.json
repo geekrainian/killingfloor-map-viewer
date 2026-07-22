@@ -10,6 +10,11 @@
     "type": "git",
     "url": "https://github.com/geekrainian/killingfloor-map-viewer.git"
   },
+  "funding": [
+    "https://buymeacoffee.com/geekrainian",
+    "https://ko-fi.com/geekrainian",
+    "https://liberapay.com/geekrainian"
+  ],
   "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
