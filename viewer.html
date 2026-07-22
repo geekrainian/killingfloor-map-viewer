@@ -1,0 +1,528 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT
+     Copyright (c) 2026 Geekrainian -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KF Map Viewer</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d10; color: #d7dde5; font: 13px/1.5 system-ui, sans-serif; }
+  #c { position: fixed; inset: 0; display: block; }
+  #ui { position: fixed; top: 10px; left: 10px; width: 320px; max-height: 94vh; overflow: auto; background: rgba(16,19,24,.92);
+        border: 1px solid #2a3038; border-radius: 8px; padding: 12px 14px; z-index: 5; }
+  #ui h1 { font-size: 14px; margin: 0 0 8px; }
+  #ui .row { margin: 6px 0; }
+  #ui label.btn, #ui button.btn { display: inline-block; padding: 6px 10px; background: #2b6cb0; border: 0; color: #fff; border-radius: 6px; cursor: pointer; font: inherit; }
+  #ui label.btn:hover, #ui button.btn:hover { background: #3182ce; }
+  #ui select, #ui input[type=range] { width: 100%; box-sizing: border-box; margin-top: 4px; }
+  #ui .muted { color: #8a93a0; }
+  #log { margin-top: 8px; font: 11px/1.45 ui-monospace, monospace; white-space: pre-wrap; color: #9aa4b0; max-height: 30vh; overflow: auto; }
+  #hint { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(16,19,24,.85);
+          padding: 6px 12px; border-radius: 6px; z-index: 5; }
+  #cross { position: fixed; top: 50%; left: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border: 1px solid #6cf; border-radius: 50%; z-index: 4; pointer-events: none; opacity: .6; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="cross"></div>
+<div id="ui">
+  <h1>Killing Floor — Map Viewer</h1>
+  <div class="row muted">1. Pick your KillingFloor game folder. 2. Pick a map.</div>
+  <div class="row"><label class="btn">Game folder…<input id="dir" type="file" webkitdirectory directory hidden></label>
+    <span id="dirinfo" class="muted"> not set</span></div>
+  <div class="row"><label class="btn">Map .rom…<input id="map" type="file" accept=".rom" hidden></label>
+    <select id="maplist" style="display:none"></select></div>
+  <div class="row muted">You can also drag a .rom onto the window.</div>
+  <div class="row">
+    <label><input id="wire" type="checkbox"> wireframe</label>
+    &nbsp;<label><input id="showbsp" type="checkbox" checked> BSP</label>
+    &nbsp;<label><input id="showsm" type="checkbox" checked> meshes</label>
+    &nbsp;<label><input id="showter" type="checkbox" checked> terrain</label>
+    &nbsp;<label><input id="showsky" type="checkbox" checked> sky</label>
+    &nbsp;<label><input id="showlight" type="checkbox"> light</label>
+  </div>
+  <div class="row muted">overlays:
+    <label><input id="showspawns" type="checkbox"> spawns</label>
+    &nbsp;<label><input id="showtrader" type="checkbox"> trader</label>
+    &nbsp;<label><input id="showpaths" type="checkbox"> paths</label>
+  </div>
+  <div class="row"><button id="reset" class="btn">Reset view</button></div>
+  <div class="row">speed <input id="speed" type="range" min="100" max="8000" value="1500"></div>
+  <div id="log"></div>
+</div>
+<div id="hint">Click — capture mouse · WASD — move · Space/Ctrl — up/down · Shift — sprint · R — reset view · Esc — release</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="kfrom.js"></script>
+<script>
+"use strict";
+const KF = window.KFRom, T = window.THREE;
+const logEl = document.getElementById("log");
+const log = (m) => { logEl.textContent += m + "\n"; logEl.scrollTop = logEl.scrollHeight; };
+const yield_ = () => new Promise((r) => setTimeout(r, 0));
+
+// PolyFlags (UE2 surface flags)
+const PF_Masked = 0x2, PF_Translucent = 0x4, PF_Modulated = 0x40;
+
+const canvas = document.getElementById("c");
+const renderer = new T.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new T.Scene();
+scene.background = new T.Color(0x0b0d10);
+const camera = new T.PerspectiveCamera(75, 1, 1, 2e6);
+let mapRoot = null, bspGroup = null, smGroup = null, terrainGroup = null, spawnsGroup = null, traderGroup = null, pathsGroup = null;
+let skyGroup = null, skyBasisS = null;   // sky box: child of scene, follows the camera (infinite backdrop)
+const s3tc = renderer.extensions.get("WEBGL_compressed_texture_s3tc");
+if (!s3tc) log("! no WEBGL_compressed_texture_s3tc — DXT textures will show as flat color");
+
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+// ---- free-fly camera (pointer lock + WASD) ---------------------------------------------------
+let yaw = 0, pitch = 0; const keys = {};
+let home = { pos: new T.Vector3(0, 500, 1000), yaw: Math.PI, pitch: -0.2 };
+const speedEl = document.getElementById("speed");
+canvas.addEventListener("click", () => canvas.requestPointerLock());
+document.addEventListener("mousemove", (e) => {
+  if (document.pointerLockElement !== canvas) return;
+  yaw -= e.movementX * 0.0022; pitch -= e.movementY * 0.0022;
+  const lim = Math.PI / 2 - 0.01; pitch = Math.max(-lim, Math.min(lim, pitch));
+});
+addEventListener("keydown", (e) => { keys[e.code] = true; if (e.code === "KeyR" && document.pointerLockElement !== canvas) resetView(); });
+addEventListener("keyup", (e) => { keys[e.code] = false; });
+function resetView() { camera.position.copy(home.pos); yaw = home.yaw; pitch = home.pitch; }
+document.getElementById("reset").addEventListener("click", resetView);
+
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+  const dir = new T.Vector3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
+  camera.lookAt(camera.position.clone().add(dir));
+  if (skyGroup && skyBasisS) skyGroup.position.copy(camera.position).sub(skyBasisS);   // keep S under the camera
+  if (document.pointerLockElement === canvas) {
+    const right = new T.Vector3().crossVectors(dir, camera.up).normalize();
+    const sp = (+speedEl.value) * (keys.ShiftLeft || keys.ShiftRight ? 4 : 1) * dt;
+    const move = new T.Vector3();
+    if (keys.KeyW) move.add(dir); if (keys.KeyS) move.sub(dir);
+    if (keys.KeyD) move.add(right); if (keys.KeyA) move.sub(right);
+    if (keys.Space) move.y += 1; if (keys.ControlLeft || keys.KeyC) move.y -= 1;
+    if (keys.KeyR) resetView();
+    if (move.lengthSq() > 0) camera.position.add(move.normalize().multiplyScalar(sp));
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---- game folder index + package cache -------------------------------------------------------
+const fileIndex = new Map();   // basename(lower) -> File
+const pkgCache = new Map();    // basename(lower) -> parsed package (with ._key)
+const threeTexCache = new Map();
+
+document.getElementById("dir").addEventListener("change", (e) => {
+  fileIndex.clear(); pkgCache.clear(); threeTexCache.clear();
+  const maps = [];
+  for (const f of e.target.files) {
+    const base = f.name.toLowerCase().replace(/\.[^.]+$/, "");
+    if (/\.(utx|usx|u|rom)$/i.test(f.name)) fileIndex.set(base, f);
+    if (/\.rom$/i.test(f.name)) maps.push(f);
+  }
+  document.getElementById("dirinfo").textContent = ` ${fileIndex.size} packages`;
+  const sel = document.getElementById("maplist");
+  if (maps.length) {
+    sel.style.display = "block"; sel.innerHTML = '<option value="">— map from folder —</option>';
+    maps.sort((a, b) => a.name.localeCompare(b.name)).forEach((f) => { const o = document.createElement("option"); o.value = f.name.toLowerCase().replace(/\.[^.]+$/, ""); o.textContent = f.name; sel.appendChild(o); });
+    sel.onchange = () => { if (sel.value) loadMapFile(fileIndex.get(sel.value)); };
+  }
+  log(`folder indexed: ${fileIndex.size} packages, ${maps.length} maps`);
+});
+
+async function getPackage(basename) {
+  const key = basename.toLowerCase();
+  if (pkgCache.has(key)) return pkgCache.get(key);
+  const f = fileIndex.get(key);
+  if (!f) { pkgCache.set(key, null); return null; }
+  let pkg = null; try { pkg = KF.parsePackage(new Uint8Array(await f.arrayBuffer())); pkg._key = key; } catch (err) { log(`! ${f.name}: ${err.message}`); }
+  pkgCache.set(key, pkg); return pkg;
+}
+const pkgKey = (pkg) => pkg._key || "__map__";
+
+// ---- texture resolution (shared by BSP surfaces and mesh sections) ---------------------------
+const WRAP_FIELDS = ["Diffuse", "Material", "Material1"];
+function findExport(pkg, name, cls) {
+  let hit = null;
+  for (const e of pkg.exports) { if (e.name !== name) continue; const c = pkg.classOf(e); if (c === cls) return e; if (!hit) hit = e; }
+  return hit;
+}
+// Blend mode carried down the material wrapper chain. Transparency in KF effects (rain, glass,
+// fences) is set by the wrapper (FinalBlend/Shader), not by the base texture flags.
+const BLEND_RANK = { additive: 5, translucent: 4, modulated: 3, masked: 2 };
+const stronger = (a, b) => ((BLEND_RANK[b] || 0) > (BLEND_RANK[a] || 0) ? b : a);
+function wrapperBlend(cls, props) {
+  let blend = null, alphaRef = 0.5;
+  if (cls === "FinalBlend") {
+    const fb = props.FrameBufferBlending;                       // EFrameBufferBlending
+    if (fb === 4 || fb === 6) blend = "additive"; else if (fb === 1 || fb === 5) blend = "modulated"; else if (fb === 2) blend = "translucent";
+    if (props.AlphaTest) { blend = stronger(blend, "masked"); if (props.AlphaRef != null) alphaRef = props.AlphaRef / 255; }
+  } else if (cls === "Shader") {
+    const ob = props.OutputBlending;                            // EOutputBlending
+    if (ob === 5) blend = "additive"; else if (ob === 3) blend = "translucent"; else if (ob === 2 || ob === 6) blend = "modulated"; else if (ob === 1) blend = "masked";
+    if (props.Opacity && !blend) blend = "masked";
+  }
+  return { blend, alphaRef };
+}
+async function resolveTexObject(pkg, exp, depth, hint) {
+  hint = hint || { blend: null, alphaRef: 0.5 };
+  if (!pkg || !exp || depth > 6) return null;
+  const cls = pkg.classOf(exp);
+  const { props } = KF.readTextureProps(pkg, exp);
+  const wb = wrapperBlend(cls, props);
+  if (wb.blend) { hint.blend = stronger(hint.blend, wb.blend); if (wb.blend === "masked") hint.alphaRef = wb.alphaRef; }
+  if (cls === "Texture" || cls === "Cubemap") {
+    let mip; try { mip = KF.readTextureMip0(pkg, exp); } catch (e) { return null; }
+    if (!mip) return null;
+    if (mip.masked) hint.blend = stronger(hint.blend, "masked");
+    if (mip.alpha) hint.blend = stronger(hint.blend, "translucent");
+    return { mip, blend: hint.blend, alphaRef: hint.alphaRef };
+  }
+  for (const fld of WRAP_FIELDS) {
+    const ref = props[fld]; if (!ref) continue;
+    let child = null;
+    if (ref > 0) child = await resolveTexObject(pkg, pkg.exports[ref - 1], depth + 1, hint);
+    else { const info = KF.resolveMaterial(pkg, ref); if (info && info.file) { const p2 = await getPackage(info.file); if (p2) child = await resolveTexObject(p2, findExport(p2, info.name, "Texture"), depth + 1, hint); } }
+    if (child) return child;
+  }
+  return null;
+}
+// pkg = resolution context; ref = material object ref -> { tex, size, masked, alpha } or null
+async function threeTexFor(pkg, ref) {
+  if (!ref) return null;
+  const key = pkgKey(pkg) + "|" + ref;
+  if (threeTexCache.has(key)) return threeTexCache.get(key);
+  let tres = null;
+  try {
+    if (ref > 0) tres = await resolveTexObject(pkg, pkg.exports[ref - 1], 0);
+    else { const info = KF.resolveMaterial(pkg, ref); if (info && info.file) { const p = await getPackage(info.file); if (p) tres = await resolveTexObject(p, findExport(p, info.name, "Texture"), 0); } }
+  } catch (e) {}
+  let entry = null;
+  if (tres) { const tex = mipToTexture(tres.mip); if (tex) entry = { tex, size: [tres.mip.width, tres.mip.height], blend: tres.blend, alphaRef: tres.alphaRef }; }
+  threeTexCache.set(key, entry); return entry;
+}
+
+function mipToTexture(mip) {
+  if (!mip || !mip.width) return null;
+  let tex;
+  if (mip.fmtCode === 3 || mip.fmtCode === 7 || mip.fmtCode === 8) {
+    if (!s3tc) return null;
+    // DXT1 with a masked texture carries 1-bit alpha — decode it as RGBA so cutouts read through.
+    const fmt = mip.fmtCode === 3 ? (mip.masked ? T.RGBA_S3TC_DXT1_Format : T.RGB_S3TC_DXT1_Format)
+      : mip.fmtCode === 7 ? T.RGBA_S3TC_DXT3_Format : T.RGBA_S3TC_DXT5_Format;
+    tex = new T.CompressedTexture([{ data: mip.data, width: mip.width, height: mip.height }], mip.width, mip.height, fmt);
+    tex.minFilter = T.LinearFilter; tex.generateMipmaps = false;
+  } else if (mip.fmtCode === 0 && mip.palette) {
+    const rgba = new Uint8Array(mip.width * mip.height * 4);
+    for (let i = 0; i < mip.width * mip.height; i++) { const p = mip.data[i] * 4; rgba[i * 4] = mip.palette[p]; rgba[i * 4 + 1] = mip.palette[p + 1]; rgba[i * 4 + 2] = mip.palette[p + 2]; rgba[i * 4 + 3] = (mip.masked && mip.data[i] === 0) ? 0 : 255; }
+    tex = new T.DataTexture(rgba, mip.width, mip.height, T.RGBAFormat);
+  } else if (mip.fmtCode === 5 || mip.fmtCode === 4) {
+    const bpp = mip.fmtCode === 5 ? 4 : 3, rgba = new Uint8Array(mip.width * mip.height * 4);
+    for (let i = 0; i < mip.width * mip.height; i++) { const s = i * bpp; rgba[i * 4] = mip.data[s + 2]; rgba[i * 4 + 1] = mip.data[s + 1]; rgba[i * 4 + 2] = mip.data[s]; rgba[i * 4 + 3] = bpp === 4 ? mip.data[s + 3] : 255; }
+    tex = new T.DataTexture(rgba, mip.width, mip.height, T.RGBAFormat);
+  } else return null;
+  tex.wrapS = tex.wrapT = T.RepeatWrapping; tex.anisotropy = 4; tex.needsUpdate = true;
+  return tex;
+}
+let wireOn = false;
+function flatColor(ref) { const h = ((Math.abs(ref | 0) * 2654435761) >>> 0) % 360; return new T.Color(`hsl(${h},30%,52%)`); }
+
+// DoubleSide throughout (Unreal is left-handed, three right-handed, so winding is inverted).
+// Masked cutouts (foliage/grilles/fences) -> alphaTest; translucent (glass) -> blended.
+function makeMat(entry, ref, polyFlags) {
+  polyFlags = polyFlags || 0;
+  if (!(entry && entry.tex)) return new T.MeshBasicMaterial({ color: flatColor(ref || 1), side: T.DoubleSide, wireframe: wireOn });
+  let blend = entry.blend;
+  if (polyFlags & PF_Modulated) blend = stronger(blend, "modulated");
+  else if (polyFlags & PF_Translucent) blend = stronger(blend, "translucent");
+  if (polyFlags & PF_Masked) blend = stronger(blend, "masked");
+  const mat = new T.MeshBasicMaterial({ map: entry.tex, side: T.DoubleSide, wireframe: wireOn });
+  if (blend === "additive") { mat.transparent = true; mat.blending = T.AdditiveBlending; mat.depthWrite = false; }
+  else if (blend === "translucent") { mat.transparent = true; mat.opacity = 0.6; mat.depthWrite = false; }
+  else if (blend === "modulated") { mat.transparent = true; mat.blending = T.MultiplyBlending; mat.depthWrite = false; }
+  else if (blend === "masked") { mat.alphaTest = entry.alphaRef || 0.5; mat.transparent = true; }
+  return mat;
+}
+
+// ---- approximate baked lighting from Light/Spotlight actors ----------------------------------
+let lights = [], lightGrid = null, lightOn = false;
+function hsvToRgb(h, s, v) {
+  const i = Math.floor(h * 6) % 6, f = h * 6 - Math.floor(h * 6), p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+  return [[v, t, p], [q, v, p], [p, v, t], [p, q, v], [t, p, v], [v, p, q]][(i + 6) % 6];
+}
+const LIGHT_CELL = 2048, AMBIENT = 0.3, RADIUS_SCALE = 25;   // RADIUS_SCALE/AMBIENT: calibration knobs
+function gatherLights(pkg) {
+  const out = [];
+  for (const a of KF.readActors(pkg, ["Light", "Spotlight", "TriggerLight", "DynamicLight", "Sunlight"])) {
+    if (!a.location) continue;
+    const p = a.props, bright = (p.LightBrightness != null ? p.LightBrightness : 64) / 255;
+    if (bright <= 0) continue;
+    const rgb = hsvToRgb((p.LightHue != null ? p.LightHue : 0) / 255, 1 - (p.LightSaturation != null ? p.LightSaturation : 255) / 255, 1);
+    const rad = (p.LightRadius != null ? p.LightRadius : 64) * RADIUS_SCALE;
+    out.push({ x: a.location[0], y: a.location[1], z: a.location[2], r: rgb[0] * bright, g: rgb[1] * bright, b: rgb[2] * bright, rad, rad2: rad * rad });
+  }
+  return out;
+}
+function buildLightGrid(ls) {
+  const grid = new Map(), C = LIGHT_CELL;
+  for (let i = 0; i < ls.length; i++) {
+    const L = ls[i];
+    for (let x = Math.floor((L.x - L.rad) / C); x <= Math.floor((L.x + L.rad) / C); x++)
+      for (let y = Math.floor((L.y - L.rad) / C); y <= Math.floor((L.y + L.rad) / C); y++)
+        for (let z = Math.floor((L.z - L.rad) / C); z <= Math.floor((L.z + L.rad) / C); z++) {
+          const k = x + "," + y + "," + z; let arr = grid.get(k); if (!arr) { arr = []; grid.set(k, arr); } arr.push(i);
+        }
+  }
+  return grid;
+}
+function sampleLight(x, y, z) {
+  let r = AMBIENT, g = AMBIENT, b = AMBIENT;
+  const C = LIGHT_CELL, arr = lightGrid && lightGrid.get(Math.floor(x / C) + "," + Math.floor(y / C) + "," + Math.floor(z / C));
+  if (arr) for (const i of arr) { const L = lights[i], dx = x - L.x, dy = y - L.y, dz = z - L.z, d2 = dx * dx + dy * dy + dz * dz; if (d2 >= L.rad2) continue; const at = 1 - Math.sqrt(d2) / L.rad; r += L.r * at; g += L.g * at; b += L.b * at; }
+  return [r > 1 ? 1 : r, g > 1 ? 1 : g, b > 1 ? 1 : b];
+}
+function bakeColors(positions) {
+  const n = positions.length / 3, col = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const c = sampleLight(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
+  return col;
+}
+
+// ---- static mesh geometry cache --------------------------------------------------------------
+const geoCache = new Map();   // "pkgKey|meshName" -> { geo, materials } | null
+async function buildStaticMesh(mapPkg, ref) {
+  let meshPkg = null, meshExp = null;
+  if (ref > 0) { meshExp = mapPkg.exports[ref - 1]; if (meshExp && mapPkg.classOf(meshExp) === "StaticMesh") meshPkg = mapPkg; else return null; }
+  else { const info = KF.resolveMaterial(mapPkg, ref); if (!info || !info.file) return null; meshPkg = await getPackage(info.file); if (!meshPkg) return null; meshExp = findExport(meshPkg, info.name, "StaticMesh"); if (!meshExp) return null; }
+  const ck = pkgKey(meshPkg) + "|" + meshExp.name;
+  if (geoCache.has(ck)) return geoCache.get(ck);
+  let out = null;
+  try {
+    const m = KF.readStaticMesh(meshPkg, meshExp);
+    if (m) {
+      const geo = new T.BufferGeometry();
+      geo.setAttribute("position", new T.BufferAttribute(m.positions, 3));
+      if (m.uvs) geo.setAttribute("uv", new T.BufferAttribute(m.uvs, 2));
+      geo.setIndex(new T.BufferAttribute(m.indices, 1));
+      const materials = [];
+      const secs = m.sections.length ? m.sections : [{ FirstIndex: 0, NumFaces: m.indices.length / 3 }];
+      for (let i = 0; i < secs.length; i++) {
+        geo.addGroup(secs[i].FirstIndex, secs[i].NumFaces * 3, i);
+        const matRef = m.materials[i] || 0;
+        materials.push(makeMat(await threeTexFor(meshPkg, matRef), matRef, 0));
+      }
+      geo.computeVertexNormals();
+      out = { geo, materials };
+    }
+  } catch (e) {}
+  geoCache.set(ck, out); return out;
+}
+
+// Actor -> world matrix in Unreal space: Location + FRotationMatrix * (scale ∘ (v - PrePivot)).
+function unrealMatrix(a) {
+  const sx = a.drawScale * a.drawScale3D[0], sy = a.drawScale * a.drawScale3D[1], sz = a.drawScale * a.drawScale3D[2];
+  const k = Math.PI / 32768, P = a.rotation[0] * k, Y = a.rotation[1] * k, R = a.rotation[2] * k;
+  const SP = Math.sin(P), CP = Math.cos(P), SY = Math.sin(Y), CY = Math.cos(Y), SR = Math.sin(R), CR = Math.cos(R);
+  const m00 = CP * CY, m01 = CP * SY, m02 = SP;
+  const m10 = SR * SP * CY - CR * SY, m11 = SR * SP * SY + CR * CY, m12 = -SR * CP;
+  const m20 = -(CR * SP * CY + SR * SY), m21 = CY * SR - CR * SP * SY, m22 = CR * CP;
+  const pp = a.prePivot, L = a.location;
+  const tx = L[0] - (pp[0] * sx * m00 + pp[1] * sy * m10 + pp[2] * sz * m20);
+  const ty = L[1] - (pp[0] * sx * m01 + pp[1] * sy * m11 + pp[2] * sz * m21);
+  const tz = L[2] - (pp[0] * sx * m02 + pp[1] * sy * m12 + pp[2] * sz * m22);
+  return new T.Matrix4().set(sx * m00, sy * m10, sz * m20, tx, sx * m01, sy * m11, sz * m21, ty, sx * m02, sy * m12, sz * m22, tz, 0, 0, 0, 1);
+}
+
+// Build BSP material-groups into a target group. Sky surfaces render depth-off, first (backdrop).
+async function addBspGroups(pkg, groups, target, isSky, bumpFn) {
+  let tris = 0;
+  for (const group of groups.values()) {
+    const entry = await threeTexFor(pkg, group.materialRef);
+    const n = group.positions.length / 3, uv = new Float32Array(n * 2), size = entry ? entry.size : [256, 256];
+    for (let i = 0; i < n; i++) {
+      uv[i * 2] = group.uvs[i * 2] / size[0]; uv[i * 2 + 1] = group.uvs[i * 2 + 1] / size[1];
+      if (bumpFn) bumpFn(group.positions[i * 3], group.positions[i * 3 + 1], group.positions[i * 3 + 2]);
+    }
+    const geo = new T.BufferGeometry();
+    geo.setAttribute("position", new T.BufferAttribute(new Float32Array(group.positions), 3));
+    geo.setAttribute("uv", new T.BufferAttribute(uv, 2));
+    geo.setIndex(group.indices);
+    const mat = makeMat(entry, group.materialRef, group.polyFlags);
+    if (isSky) { mat.depthTest = false; mat.depthWrite = false; mat.fog = false; }
+    else if (lights.length) { geo.setAttribute("color", new T.BufferAttribute(bakeColors(group.positions), 3)); mat.vertexColors = lightOn; }
+    const mesh = new T.Mesh(geo, mat);
+    if (isSky) { mesh.renderOrder = -1000; mesh.frustumCulled = false; }
+    target.add(mesh); tris += group.indices.length / 3;
+  }
+  return tris;
+}
+
+// ---- toggles ---------------------------------------------------------------------------------
+document.getElementById("wire").addEventListener("change", (e) => { wireOn = e.target.checked; scene.traverse((o) => { if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((mm) => mm.wireframe = wireOn); }); });
+document.getElementById("showbsp").addEventListener("change", (e) => { if (bspGroup) bspGroup.visible = e.target.checked; });
+document.getElementById("showsm").addEventListener("change", (e) => { if (smGroup) smGroup.visible = e.target.checked; });
+document.getElementById("showter").addEventListener("change", (e) => { if (terrainGroup) terrainGroup.visible = e.target.checked; });
+document.getElementById("showsky").addEventListener("change", (e) => { if (skyGroup) skyGroup.visible = e.target.checked; });
+document.getElementById("showlight").addEventListener("change", (e) => {
+  lightOn = e.target.checked;
+  for (const grp of [bspGroup, terrainGroup]) if (grp) grp.traverse((o) => { if (o.material && o.geometry && o.geometry.getAttribute("color")) { o.material.vertexColors = lightOn; o.material.needsUpdate = true; } });
+  if (smGroup) smGroup.traverse((o) => { if (!o.material) return; (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { const c = m.userData && m.userData.litColor; if (c) m.color.setRGB(lightOn ? c[0] : 1, lightOn ? c[1] : 1, lightOn ? c[2] : 1); }); });
+});
+document.getElementById("showspawns").addEventListener("change", (e) => { if (spawnsGroup) spawnsGroup.visible = e.target.checked; });
+document.getElementById("showtrader").addEventListener("change", (e) => { if (traderGroup) traderGroup.visible = e.target.checked; });
+document.getElementById("showpaths").addEventListener("change", (e) => { if (pathsGroup) pathsGroup.visible = e.target.checked; });
+
+// overlay markers (always-visible billboards / lines)
+function pointsFromLocs(locs, color, size) {
+  if (!locs.length) return null;
+  const pos = new Float32Array(locs.length * 3);
+  for (let i = 0; i < locs.length; i++) { pos[i * 3] = locs[i][0]; pos[i * 3 + 1] = locs[i][1]; pos[i * 3 + 2] = locs[i][2]; }
+  const g = new T.BufferGeometry(); g.setAttribute("position", new T.BufferAttribute(pos, 3));
+  const p = new T.Points(g, new T.PointsMaterial({ color, size, sizeAttenuation: true, depthTest: false, transparent: true }));
+  p.renderOrder = 999; p.frustumCulled = false; return p;
+}
+
+// ---- load a map ------------------------------------------------------------------------------
+async function loadMapFile(file) {
+  if (!file) return;
+  log(`\nloading ${file.name}…`);
+  let pkg; try { pkg = KF.parsePackage(new Uint8Array(await file.arrayBuffer())); } catch (e) { log("! package: " + e.message); return; }
+
+  if (mapRoot) { scene.remove(mapRoot); disposeTree(mapRoot); }
+  if (skyGroup) { scene.remove(skyGroup); disposeTree(skyGroup); skyGroup = null; skyBasisS = null; }
+  mapRoot = new T.Group(); mapRoot.rotation.x = -Math.PI / 2;   // Unreal Z-up -> three Y-up
+  bspGroup = new T.Group(); smGroup = new T.Group(); terrainGroup = new T.Group();
+  spawnsGroup = new T.Group(); traderGroup = new T.Group(); pathsGroup = new T.Group();
+  spawnsGroup.visible = document.getElementById("showspawns").checked;
+  traderGroup.visible = document.getElementById("showtrader").checked;
+  pathsGroup.visible = document.getElementById("showpaths").checked;
+  mapRoot.add(bspGroup); mapRoot.add(smGroup); mapRoot.add(terrainGroup);
+  mapRoot.add(spawnsGroup); mapRoot.add(traderGroup); mapRoot.add(pathsGroup);
+  const uMin = [Infinity, Infinity, Infinity], uMax = [-Infinity, -Infinity, -Infinity];
+  const bump = (x, y, z) => { if (x < uMin[0]) uMin[0] = x; if (y < uMin[1]) uMin[1] = y; if (z < uMin[2]) uMin[2] = z; if (x > uMax[0]) uMax[0] = x; if (y > uMax[1]) uMax[1] = y; if (z > uMax[2]) uMax[2] = z; };
+
+  lightOn = document.getElementById("showlight").checked;
+  lights = gatherLights(pkg); lightGrid = lights.length ? buildLightGrid(lights) : null;
+  if (lights.length) log(`lights: ${lights.length}`);
+
+  // BSP (+ sky box)
+  const world = KF.findWorldModel(pkg);
+  let bspTris = 0, skyZone = 0;
+  if (world) {
+    const model = KF.readModel(pkg, world);
+    // the sky box = the BSP zone whose centroid is closest to the SkyZoneInfo actor
+    const skyActors = KF.readActors(pkg, ["SkyZoneInfo"]);
+    if (skyActors.length && skyActors[0].location) {
+      const S = skyActors[0].location, agg = new Map();
+      for (const nd of model.nodes) {
+        if (nd.numVertices < 1 || nd.iVertPool < 0 || !nd.zone) continue;
+        const fv = model.verts[nd.iVertPool]; if (!fv) continue; const p = model.points[fv.pVertex]; if (!p) continue;
+        let a = agg.get(nd.zone); if (!a) { a = [0, 0, 0, 0]; agg.set(nd.zone, a); } a[0] += p[0]; a[1] += p[1]; a[2] += p[2]; a[3]++;
+      }
+      let best = Infinity;
+      for (const [z, a] of agg) { const d = (a[0] / a[3] - S[0]) ** 2 + (a[1] / a[3] - S[1]) ** 2 + (a[2] / a[3] - S[2]) ** 2; if (d < best) { best = d; skyZone = z; } }
+      if (skyZone) {
+        skyGroup = new T.Group(); skyGroup.rotation.x = -Math.PI / 2; scene.add(skyGroup);
+        skyBasisS = new T.Vector3(S[0], S[2], -S[1]);
+        const skyTris = await addBspGroups(pkg, KF.buildMesh(pkg, model, (nn) => nn.zone === skyZone), skyGroup, true, null);
+        skyGroup.visible = document.getElementById("showsky").checked;
+        log(`sky: zone ${skyZone}, ${skyTris} tris`);
+      }
+    }
+    const groups = KF.buildMesh(pkg, model, skyZone ? ((nn) => nn.zone !== skyZone) : null);
+    bspTris = await addBspGroups(pkg, groups, bspGroup, false, bump);
+    log(`BSP: ${groups.size} groups, ${bspTris} tris`);
+  } else log("no world Model (mesh-based map)");
+
+  // terrain (heightmap)
+  const ti = KF.readTerrainInfo(pkg);
+  if (ti) {
+    let hmip = null, hmPkg = pkg;
+    if (ti.terrainMapRef > 0) { const e = pkg.exports[ti.terrainMapRef - 1]; if (e) hmip = KF.readTextureMip0(pkg, e); }
+    else { const info = KF.resolveMaterial(pkg, ti.terrainMapRef); if (info && info.file) { const p = await getPackage(info.file); if (p) { hmPkg = p; const e = findExport(p, info.name, "Texture"); if (e) hmip = KF.readTextureMip0(p, e); } } }
+    if (hmip && hmip.fmtCode === 10) {
+      const w = hmip.width, h = hmip.height, hdv = new DataView(hmip.data.buffer, hmip.data.byteOffset, hmip.data.byteLength);
+      const heights = new Uint16Array(w * h);
+      for (let i = 0; i < w * h; i++) heights[i] = hdv.getUint16(i * 2, true);
+      const tm = KF.buildTerrainMesh(heights, w, h, ti.scale, ti.location, ti.layer0 ? ti.layer0.uScale : 0, ti.layer0 ? ti.layer0.vScale : 0);
+      const geo = new T.BufferGeometry();
+      geo.setAttribute("position", new T.BufferAttribute(tm.positions, 3));
+      geo.setAttribute("uv", new T.BufferAttribute(tm.uvs, 2));
+      geo.setIndex(new T.BufferAttribute(tm.indices, 1));
+      geo.computeVertexNormals();
+      if (lights.length) geo.setAttribute("color", new T.BufferAttribute(bakeColors(tm.positions), 3));
+      const entry = ti.layer0 ? await threeTexFor(pkg, ti.layer0.texRef) : null;
+      const tmat = makeMat(entry, ti.layer0 ? ti.layer0.texRef : 1, 0);
+      if (lights.length) tmat.vertexColors = lightOn;
+      terrainGroup.add(new T.Mesh(geo, tmat));
+      for (let i = 0; i < w * h; i++) bump(tm.positions[i * 3], tm.positions[i * 3 + 1], tm.positions[i * 3 + 2]);
+      log(`terrain: ${w}x${h} grid, ${tm.indices.length / 3} tris`);
+    }
+  }
+
+  // static meshes
+  const actors = KF.readStaticMeshActors(pkg);
+  let inst = 0, smTris = 0, smMiss = 0, i = 0;
+  for (const act of actors) {
+    const built = await buildStaticMesh(pkg, act.meshRef);
+    if (!built) { smMiss++; }
+    else {
+      let mats = built.materials;
+      if (lights.length) {
+        const c = sampleLight(act.location[0], act.location[1], act.location[2]);
+        mats = built.materials.map((m) => { const cm = m.clone(); cm.userData = { litColor: c }; if (lightOn) cm.color.setRGB(c[0], c[1], c[2]); return cm; });
+      }
+      const mesh = new T.Mesh(built.geo, mats);
+      mesh.matrixAutoUpdate = false; mesh.matrix.copy(unrealMatrix(act));
+      smGroup.add(mesh); inst++; smTris += built.geo.index.count / 3;
+      bump(act.location[0], act.location[1], act.location[2]);
+    }
+    if ((++i & 255) === 0) { log(`  meshes ${i}/${actors.length}…`); await yield_(); }
+  }
+  log(`static meshes: ${inst} instances, ${smTris | 0} tris${smMiss ? `, ${smMiss} unresolved` : ""}`);
+
+  // overlays: player spawns, trader spots, monster path nodes (points only)
+  const TRADER = new Set(["KFTraderTeleporter", "ShopVolume", "WeaponLocker", "KFTraderDoor"]);
+  const spawns = [], trader = [], paths = [];
+  for (const a of KF.readActors(pkg, ["PlayerStart", "PathNode", ...TRADER])) {
+    if (!a.location) continue;
+    if (a.cls === "PlayerStart") spawns.push(a.location);
+    else if (a.cls === "PathNode") paths.push(a.location);
+    else trader.push(a.location);
+  }
+  let o;
+  if ((o = pointsFromLocs(spawns, 0x33dd55, 55))) spawnsGroup.add(o);
+  if ((o = pointsFromLocs(trader, 0xffcc33, 65))) traderGroup.add(o);
+  if ((o = pointsFromLocs(paths, 0xff5555, 40))) pathsGroup.add(o);
+  log(`overlays: ${spawns.length} spawns, ${trader.length} trader, ${paths.length} path nodes`);
+
+  scene.add(mapRoot);
+  frameCamera(uMin, uMax);
+  log(`done: BSP ${bspTris} + meshes ${smTris | 0} tris`);
+}
+
+function frameCamera(uMin, uMax) {
+  if (!isFinite(uMin[0])) { home = { pos: new T.Vector3(0, 500, 1000), yaw: Math.PI, pitch: -0.2 }; resetView(); return; }
+  const c = [(uMin[0] + uMax[0]) / 2, (uMin[1] + uMax[1]) / 2, (uMin[2] + uMax[2]) / 2];
+  const sz = [uMax[0] - uMin[0], uMax[1] - uMin[1], uMax[2] - uMin[2]];
+  const diag = Math.hypot(sz[0], sz[1], sz[2]);
+  // Unreal center -> three (x, z, -y); start above and behind
+  home = { pos: new T.Vector3(c[0], c[2] + sz[2] * 0.25 + 200, -c[1] + diag * 0.5), yaw: Math.PI, pitch: -0.2 };
+  resetView();
+  speedEl.value = Math.round(Math.max(600, diag / 45));
+}
+
+function disposeTree(root) { root.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (m.map) m.map.dispose(); m.dispose(); }); }); threeTexCache.clear(); geoCache.clear(); }
+
+document.getElementById("map").addEventListener("change", (e) => { if (e.target.files[0]) loadMapFile(e.target.files[0]); });
+addEventListener("dragover", (e) => e.preventDefault());
+addEventListener("drop", (e) => { e.preventDefault(); const f = [...e.dataTransfer.files].find((f) => /\.rom$/i.test(f.name)); if (f) loadMapFile(f); else log("drop a .rom file"); });
+</script>
+</body>
+</html>

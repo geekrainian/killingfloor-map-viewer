@@ -1,0 +1,39 @@
+# Killing Floor / Unreal Engine 2.5 game content — never commit these.
+# The viewer reads them from your own game install; they are Tripwire's assets, not part of this repo.
+*.rom
+*.utx
+*.usx
+*.ukx
+*.uax
+*.umx
+*.uz2
+*.u
+*.int
+*.upl
+*.ucl
+*.det
+*.rus
+*.rus_utx
+*.rus_uax
+*.ogg
+
+# folders where someone might drop game files next to the viewer
+/maps/
+/assets/
+/Maps/
+/Textures/
+/StaticMeshes/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# node / misc
+node_modules/
+npm-debug.log*
+*.tmp
