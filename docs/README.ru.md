@@ -2,7 +2,7 @@
 
 [English](../README.md) · **Русский** · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Десктопное приложение (Windows / macOS / Linux) для просмотра карт Killing Floor (`*.rom`, Unreal Engine 2.5). Рисует мир с текстурами и позволяет летать по нему свободной камерой — без запуска тяжёлого редактора KFEd. Тот же просмотрщик работает и как одна страница `viewer.html` в браузере. Формат `.rom` я разобрал вручную; подробности — в [`RESEARCH.ru.md`](./RESEARCH.ru.md).
+Десктопное приложение (Windows / macOS / Linux) для просмотра игровых карт Killing Floor (`*.rom`, Unreal Engine 2.5). Рисует мир с текстурами и позволяет летать по нему свободной камерой — без запуска тяжёлого редактора KFEd. Тот же просмотрщик работает и как одна страница `viewer.html` в браузере. Формат `.rom` я разобрал вручную; подробности — в [`RESEARCH.ru.md`](./RESEARCH.ru.md).
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 

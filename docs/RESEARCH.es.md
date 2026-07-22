@@ -1,4 +1,4 @@
-# El formato de mapas de Killing Floor
+# El formato de mapas del juego de Killing Floor
 
 [English](../RESEARCH.md) · [Русский](./RESEARCH.ru.md) · **Español** · [Português](./RESEARCH.pt.md) · [Lietuvių](./RESEARCH.lt.md) · [Polski](./RESEARCH.pl.md) · [Français](./RESEARCH.fr.md) · [中文](./RESEARCH.zh.md) · [日本語](./RESEARCH.ja.md)
 

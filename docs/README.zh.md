@@ -2,7 +2,7 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · **中文** · [日本語](./README.ja.md)
 
-一个用于查看 Killing Floor 地图（`*.rom`，Unreal Engine 2.5）的桌面应用（Windows / macOS / Linux）。它把关卡连同贴图一起绘制出来，让你自由飞行观察，而不必打开笨重的 KFEd 编辑器。同一个查看器也能作为单个 `viewer.html` 页面在浏览器中运行。`.rom` 格式是我手工逆向出来的，细节都写在 [`RESEARCH.md`](./RESEARCH.zh.md) 里。
+一个用于查看 Killing Floor 游戏地图（`*.rom`，Unreal Engine 2.5）的桌面应用（Windows / macOS / Linux）。它把关卡连同贴图一起绘制出来，让你自由飞行观察，而不必打开笨重的 KFEd 编辑器。同一个查看器也能作为单个 `viewer.html` 页面在浏览器中运行。`.rom` 格式是我手工逆向出来的，细节都写在 [`RESEARCH.md`](./RESEARCH.zh.md) 里。
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 

@@ -1,4 +1,4 @@
-# Killing Floor 地图格式
+# Killing Floor 游戏地图格式
 
 [English](../RESEARCH.md) · [Русский](./RESEARCH.ru.md) · [Español](./RESEARCH.es.md) · [Português](./RESEARCH.pt.md) · [Lietuvių](./RESEARCH.lt.md) · [Polski](./RESEARCH.pl.md) · [Français](./RESEARCH.fr.md) · **中文** · [日本語](./RESEARCH.ja.md)
 

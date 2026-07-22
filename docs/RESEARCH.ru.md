@@ -1,4 +1,4 @@
-# Формат карт Killing Floor
+# Формат игровых карт Killing Floor
 
 [English](../RESEARCH.md) · **Русский** · [Español](./RESEARCH.es.md) · [Português](./RESEARCH.pt.md) · [Lietuvių](./RESEARCH.lt.md) · [Polski](./RESEARCH.pl.md) · [Français](./RESEARCH.fr.md) · [中文](./RESEARCH.zh.md) · [日本語](./RESEARCH.ja.md)
 

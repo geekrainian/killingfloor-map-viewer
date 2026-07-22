@@ -1,4 +1,4 @@
-# The Killing Floor map format
+# Killing Floor Game Map Format (.rom)
 
 **English** · [Русский](./docs/RESEARCH.ru.md) · [Español](./docs/RESEARCH.es.md) · [Português](./docs/RESEARCH.pt.md) · [Lietuvių](./docs/RESEARCH.lt.md) · [Polski](./docs/RESEARCH.pl.md) · [Français](./docs/RESEARCH.fr.md) · [中文](./docs/RESEARCH.zh.md) · [日本語](./docs/RESEARCH.ja.md)
 

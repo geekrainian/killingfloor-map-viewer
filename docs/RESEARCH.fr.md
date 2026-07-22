@@ -1,4 +1,4 @@
-# Le format de carte de Killing Floor
+# Le format de carte du jeu Killing Floor
 
 [English](../RESEARCH.md) · [Русский](./RESEARCH.ru.md) · [Español](./RESEARCH.es.md) · [Português](./RESEARCH.pt.md) · [Lietuvių](./RESEARCH.lt.md) · [Polski](./RESEARCH.pl.md) · **Français** · [中文](./RESEARCH.zh.md) · [日本語](./RESEARCH.ja.md)
 

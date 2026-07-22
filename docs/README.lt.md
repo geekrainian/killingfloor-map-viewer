@@ -2,7 +2,7 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · **Lietuvių** · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Darbalaukio programa (Windows / macOS / Linux) — Killing Floor žemėlapių peržiūros įrankis (`*.rom`, Unreal Engine 2.5). Jis piešia pasaulį su tekstūromis ir leidžia po jį skraidyti neatidarant sunkaus KFEd redaktoriaus. Tas pats peržiūros įrankis veikia ir kaip vienas `viewer.html` puslapis naršyklėje. `.rom` formatą iššifravau savo rankomis; visos detalės — [`RESEARCH.lt.md`](./RESEARCH.lt.md) faile.
+Darbalaukio programa (Windows / macOS / Linux) — Killing Floor žaidimo žemėlapių peržiūros įrankis (`*.rom`, Unreal Engine 2.5). Jis piešia pasaulį su tekstūromis ir leidžia po jį skraidyti neatidarant sunkaus KFEd redaktoriaus. Tas pats peržiūros įrankis veikia ir kaip vienas `viewer.html` puslapis naršyklėje. `.rom` formatą iššifravau savo rankomis; visos detalės — [`RESEARCH.lt.md`](./RESEARCH.lt.md) faile.
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 

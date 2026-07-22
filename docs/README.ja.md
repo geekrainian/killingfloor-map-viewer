@@ -2,7 +2,7 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · **日本語**
 
-Killing Floor のマップ（`*.rom`、Unreal Engine 2.5）を表示するデスクトップアプリ（Windows / macOS / Linux）です。重い KFEd エディタを開かずに、テクスチャ付きでワールドを描画し、その中を飛び回れます。同じビューアは、ブラウザ上で単一の `viewer.html` ページとしても動作します。`.rom` フォーマットは自力で解析しました。詳細は [`RESEARCH.md`](./RESEARCH.ja.md) にあります。
+Killing Floor のゲームマップ（`*.rom`、Unreal Engine 2.5）を表示するデスクトップアプリ（Windows / macOS / Linux）です。重い KFEd エディタを開かずに、テクスチャ付きでワールドを描画し、その中を飛び回れます。同じビューアは、ブラウザ上で単一の `viewer.html` ページとしても動作します。`.rom` フォーマットは自力で解析しました。詳細は [`RESEARCH.md`](./RESEARCH.ja.md) にあります。
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 

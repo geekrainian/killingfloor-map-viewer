@@ -2,7 +2,7 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · **Polski** · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Aplikacja desktopowa (Windows / macOS / Linux) do przeglądania map Killing Floor (`*.rom`, Unreal Engine 2.5). Rysuje świat z teksturami i pozwala latać po nim swobodnie, bez odpalania ciężkiego edytora KFEd. Ta sama przeglądarka działa też jako pojedyncza strona `viewer.html` w przeglądarce internetowej. Format `.rom` rozgryzłem ręcznie; szczegóły są w [`RESEARCH.md`](./RESEARCH.pl.md).
+Aplikacja desktopowa (Windows / macOS / Linux) do przeglądania map gry Killing Floor (`*.rom`, Unreal Engine 2.5). Rysuje świat z teksturami i pozwala latać po nim swobodnie, bez odpalania ciężkiego edytora KFEd. Ta sama przeglądarka działa też jako pojedyncza strona `viewer.html` w przeglądarce internetowej. Format `.rom` rozgryzłem ręcznie; szczegóły są w [`RESEARCH.md`](./RESEARCH.pl.md).
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 

@@ -1,4 +1,4 @@
-# Killing Floor žemėlapių formatas
+# Killing Floor žaidimo žemėlapių formatas
 
 [English](../RESEARCH.md) · [Русский](./RESEARCH.ru.md) · [Español](./RESEARCH.es.md) · [Português](./RESEARCH.pt.md) · **Lietuvių** · [Polski](./RESEARCH.pl.md) · [Français](./RESEARCH.fr.md) · [中文](./RESEARCH.zh.md) · [日本語](./RESEARCH.ja.md)
 
