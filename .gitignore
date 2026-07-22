@@ -37,3 +37,6 @@ desktop.ini
 node_modules/
 npm-debug.log*
 *.tmp
+
+# electron-builder output
+/dist/

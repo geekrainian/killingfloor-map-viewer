@@ -1,0 +1,7 @@
+# pnpm blocks dependency build scripts unless allowed here. electron-winstaller
+# (pulled in by electron-builder) runs one to pick its 7-Zip arch; allow it so
+# `pnpm install` exits clean. electron itself has no build script — it fetches its
+# binary lazily on first run — but is listed for clarity.
+allowBuilds:
+  electron: true
+  electron-winstaller: true

@@ -2,20 +2,38 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · **中文** · [日本語](./README.ja.md)
 
-一个小巧的浏览器内 Killing Floor 地图查看器（`*.rom`，Unreal Engine 2.5）。它把关卡连同贴图一起绘制出来，让你自由飞行观察，而不必打开笨重的 KFEd 编辑器。`.rom` 格式是我手工逆向出来的，细节都写在 [`RESEARCH.md`](./RESEARCH.zh.md) 里。
+一个用于查看 Killing Floor 地图（`*.rom`，Unreal Engine 2.5）的桌面应用（Windows / macOS / Linux）。它把关卡连同贴图一起绘制出来，让你自由飞行观察，而不必打开笨重的 KFEd 编辑器。同一个查看器也能作为单个 `viewer.html` 页面在浏览器中运行。`.rom` 格式是我手工逆向出来的，细节都写在 [`RESEARCH.md`](./RESEARCH.zh.md) 里。
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 
 ## 你需要准备什么
 
 - 本地安装的 **Killing Floor** 游戏（查看器读取的是你自己的游戏文件：`.rom` 地图以及旁边的 `.utx`/`.usx` 包）。
-- 一个较新的基于 Chromium 的浏览器（Chrome / Edge）——它用到了 File System Access 文件夹选择器和 S3TC 压缩贴图扩展。
+- 下方的 **桌面应用**，或者一个较新的基于 Chromium 的浏览器（Chrome / Edge）——查看器用到了文件夹选择器和 S3TC 压缩贴图扩展。
 
 本仓库不附带任何游戏内容。你需要把查看器指向自己的游戏安装目录。
 
+## 桌面应用（Windows / macOS / Linux）
+
+预构建的、自包含的应用可以在 [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) 页面获取——无需浏览器：
+
+- **Windows** —— `…-setup.exe`（安装程序）或 `…-portable.exe`（免安装运行）。
+- **macOS** —— `…-mac-x64.dmg`（Intel）或 `…-mac-arm64.dmg`（Apple Silicon）。
+- **Linux** —— `…-linux-x64.AppImage`（随处运行）或 `…-linux-x64.deb`。
+
+它们用 [Electron](https://www.electronjs.org/) 把完全相同的查看器封装起来；操作方式和工作流程与下方的浏览器版本完全一致。这些构建未经签名，所以操作系统在首次启动时可能会弹出警告（Windows SmartScreen → *更多信息 → 仍要运行*；macOS → 右键点击 → *打开*）。
+
+### 自行构建
+
+```bash
+pnpm install
+pnpm start         # run the app from source
+pnpm run dist      # build installers for the current OS into dist/
+```
+
 ## 使用查看器
 
-1. 打开 `viewer.html`（双击即可）。它可以离线运行；Three.js 已内置在 `vendor/` 下。
+1. 打开桌面应用，或者在浏览器中打开 `viewer.html`（双击即可）。它可以离线运行；Three.js 已内置在 `vendor/` 下。
 2. 点击 `Game folder`，选择你的 KF 安装根目录（`…/common/KillingFloor`）。一开始只会索引包的名字；`.utx`/`.usx` 文件按需读取。
 3. 点击 `Map .rom` 选择一张地图（或者把 `.rom` 拖到窗口里）。
 
@@ -43,6 +61,7 @@ node cli.js <map.rom> out.obj    # + export the BSP as OBJ (opens in Blender / W
 | `viewer.html` | 查看器（Three.js + 一个小巧的 pointer-lock/WASD 飞行摄像机） |
 | `kfrom.js` | 核心：UE2.5 包解析、世界 BSP、静态网格、地形、贴图（浏览器和 Node 通用） |
 | `cli.js` | Node CLI：统计信息和 OBJ 导出 |
+| `electron/main.js` | 把 `viewer.html` 作为桌面应用托管的 Electron 外壳 |
 | `vendor/three.min.js` | Three.js r136（内置打包，让查看器可以离线工作） |
 | `RESEARCH.md` | 关于 `.rom` 格式以及查看器如何渲染它的笔记 |
 

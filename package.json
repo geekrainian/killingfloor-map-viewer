@@ -1,0 +1,93 @@
+{
+  "name": "killingfloor-map-viewer",
+  "productName": "Killing Floor Map Viewer",
+  "version": "0.1.0",
+  "description": "In-browser and desktop viewer for Killing Floor (.rom) maps",
+  "author": "geekrainian (https://github.com/geekrainian)",
+  "license": "MIT",
+  "packageManager": "pnpm@11.13.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geekrainian/killingfloor-map-viewer.git"
+  },
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "cli": "node cli.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "release": "electron-builder --publish always"
+  },
+  "build": {
+    "appId": "com.geekrainian.killingfloormapviewer",
+    "productName": "Killing Floor Map Viewer",
+    "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "viewer.html",
+      "kfrom.js",
+      "vendor/**/*",
+      "LICENSE"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${name}-${version}-${os}-${arch}-setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "${name}-${version}-${os}-${arch}-portable.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "build/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Graphics",
+      "icon": "build/icon.png",
+      "maintainer": "Geekrainian"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "geekrainian",
+        "repo": "killingfloor-map-viewer"
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3"
+  }
+}

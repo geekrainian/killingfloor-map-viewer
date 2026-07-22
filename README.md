@@ -2,20 +2,38 @@
 
 **English** · [Русский](./docs/README.ru.md) · [Español](./docs/README.es.md) · [Português](./docs/README.pt.md) · [Lietuvių](./docs/README.lt.md) · [Polski](./docs/README.pl.md) · [Français](./docs/README.fr.md) · [中文](./docs/README.zh.md) · [日本語](./docs/README.ja.md)
 
-A small in-browser viewer for Killing Floor maps (`*.rom`, Unreal Engine 2.5). It draws the world with textures and lets you fly around, without opening the heavy KFEd editor. I worked the `.rom` format out by hand; the details are in [`RESEARCH.md`](./RESEARCH.md).
+A desktop app (Windows / macOS / Linux) for viewing Killing Floor maps (`*.rom`, Unreal Engine 2.5). It draws the world with textures and lets you fly around, without opening the heavy KFEd editor. The same viewer also runs as a single `viewer.html` page in the browser. I worked the `.rom` format out by hand; the details are in [`RESEARCH.md`](./RESEARCH.md).
 
 ![Killing Floor Map Viewer](screenshot.jpg)
 
 ## What you need
 
 - A local **Killing Floor** game install (the viewer reads your own game files: `.rom` maps and the `.utx`/`.usx` packages next to them).
-- A recent Chromium-based browser (Chrome / Edge) — it uses the File System Access folder picker and the S3TC compressed-texture extension.
+- Either the **desktop app** below, or a recent Chromium-based browser (Chrome / Edge) — the viewer uses the folder picker and the S3TC compressed-texture extension.
 
 No game content ships with this repo. You point the viewer at your own install.
 
+## Desktop app (Windows / macOS / Linux)
+
+Prebuilt, self-contained apps are on the [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) page — no browser needed:
+
+- **Windows** — `…-setup.exe` (installer) or `…-portable.exe` (run without installing).
+- **macOS** — `…-mac-x64.dmg` (Intel) or `…-mac-arm64.dmg` (Apple Silicon).
+- **Linux** — `…-linux-x64.AppImage` (run anywhere) or `…-linux-x64.deb`.
+
+They wrap the exact same viewer in [Electron](https://www.electronjs.org/); the controls and workflow are identical to the browser version below. The builds are unsigned, so the OS may warn on first launch (Windows SmartScreen → *More info → Run anyway*; macOS → right-click → *Open*).
+
+### Build it yourself
+
+```bash
+pnpm install
+pnpm start         # run the app from source
+pnpm run dist      # build installers for the current OS into dist/
+```
+
 ## Using the viewer
 
-1. Open `viewer.html` (double-click it). It runs offline; Three.js is vendored under `vendor/`.
+1. Open the desktop app, or open `viewer.html` in a browser (double-click it). It runs offline; Three.js is vendored under `vendor/`.
 2. Click **Game folder** and pick your KF install root (`…/common/KillingFloor`). Only the package names are indexed up front; `.utx`/`.usx` files are read on demand.
 3. Click **Map .rom** and choose a map (or drag a `.rom` onto the window).
 
@@ -43,6 +61,7 @@ The OBJ has positions, faces and UVs but no textures — a quick way to check ge
 | `viewer.html` | the viewer (Three.js + a small pointer-lock/WASD fly camera) |
 | `kfrom.js` | the core: UE2.5 package parsing, world BSP, static meshes, terrain, textures (browser & Node) |
 | `cli.js` | Node CLI: stats and OBJ export |
+| `electron/main.js` | Electron shell that hosts `viewer.html` as a desktop app |
 | `vendor/three.min.js` | Three.js r136 (bundled so the viewer works offline) |
 | `RESEARCH.md` | notes on the `.rom` format and how the viewer renders it |
 

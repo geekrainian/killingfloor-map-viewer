@@ -2,20 +2,38 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · [Português](./README.pt.md) · **Lietuvių** · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Nedidelis naršyklėje veikiantis Killing Floor žemėlapių peržiūros įrankis (`*.rom`, Unreal Engine 2.5). Jis piešia pasaulį su tekstūromis ir leidžia po jį skraidyti neatidarant sunkaus KFEd redaktoriaus. `.rom` formatą iššifravau savo rankomis; visos detalės — [`RESEARCH.lt.md`](./RESEARCH.lt.md) faile.
+Darbalaukio programa (Windows / macOS / Linux) — Killing Floor žemėlapių peržiūros įrankis (`*.rom`, Unreal Engine 2.5). Jis piešia pasaulį su tekstūromis ir leidžia po jį skraidyti neatidarant sunkaus KFEd redaktoriaus. Tas pats peržiūros įrankis veikia ir kaip vienas `viewer.html` puslapis naršyklėje. `.rom` formatą iššifravau savo rankomis; visos detalės — [`RESEARCH.lt.md`](./RESEARCH.lt.md) faile.
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 
 ## Ko reikia
 
 - Vietinės **Killing Floor** žaidimo instaliacijos (peržiūros įrankis skaito tavo paties žaidimo failus: `.rom` žemėlapius ir šalia esančius `.utx`/`.usx` paketus).
-- Naujesnės Chromium pagrindo naršyklės (Chrome / Edge) — naudojamas File System Access aplankų parinkiklis ir S3TC suspaustų tekstūrų plėtinys.
+- Arba toliau esančios **darbalaukio programos**, arba naujesnės Chromium pagrindo naršyklės (Chrome / Edge) — peržiūros įrankis naudoja aplankų parinkiklį ir S3TC suspaustų tekstūrų plėtinį.
 
 Su šia repozitorija joks žaidimo turinys nepateikiamas. Peržiūros įrankį nukreipi į savo paties instaliaciją.
 
+## Darbalaukio programa (Windows / macOS / Linux)
+
+Iš anksto sukompiliuotos, savarankiškos programos yra [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) puslapyje — naršyklės nereikia:
+
+- **Windows** — `…-setup.exe` (diegimo programa) arba `…-portable.exe` (paleidžiama nediegiant).
+- **macOS** — `…-mac-x64.dmg` (Intel) arba `…-mac-arm64.dmg` (Apple Silicon).
+- **Linux** — `…-linux-x64.AppImage` (paleidžiama bet kur) arba `…-linux-x64.deb`.
+
+Jos supakuoja lygiai tą patį peržiūros įrankį į [Electron](https://www.electronjs.org/); valdymas ir darbo eiga tokie patys kaip toliau aprašytoje naršyklės versijoje. Šie dariniai nepasirašyti, tad operacinė sistema pirmą kartą paleidžiant gali įspėti (Windows SmartScreen → *Daugiau informacijos → Vis tiek paleisti*; macOS → dešinysis pelės klavišas → *Atidaryti*).
+
+### Susikompiliuok pats
+
+```bash
+pnpm install
+pnpm start         # run the app from source
+pnpm run dist      # build installers for the current OS into dist/
+```
+
 ## Kaip naudotis peržiūros įrankiu
 
-1. Atidaryk `viewer.html` (dukart spustelėk). Jis veikia be interneto; Three.js yra sudėtas į `vendor/`.
+1. Atidaryk darbalaukio programą arba `viewer.html` naršyklėje (dukart spustelėk). Jis veikia be interneto; Three.js yra sudėtas į `vendor/`.
 2. Spustelėk **Game folder** ir pasirink savo KF instaliacijos šakninį aplanką (`…/common/KillingFloor`). Iš karto indeksuojami tik paketų pavadinimai; `.utx`/`.usx` failai skaitomi pagal poreikį.
 3. Spustelėk **Map .rom** ir pasirink žemėlapį (arba tempk `.rom` ant lango).
 
@@ -43,6 +61,7 @@ OBJ turi pozicijas, briaunas ir UV, bet neturi tekstūrų — greitas būdas pat
 | `viewer.html` | peržiūros įrankis (Three.js + nedidelė pointer-lock/WASD skraidymo kamera) |
 | `kfrom.js` | branduolys: UE2.5 paketų analizė, pasaulio BSP, statiniai tinkleliai, reljefas, tekstūros (naršyklėje ir Node) |
 | `cli.js` | Node CLI: statistika ir OBJ eksportas |
+| `electron/main.js` | Electron apvalkalas, kuriame `viewer.html` veikia kaip darbalaukio programa |
 | `vendor/three.min.js` | Three.js r136 (sudėtas, kad peržiūros įrankis veiktų be interneto) |
 | `RESEARCH.md` | užrašai apie `.rom` formatą ir kaip peržiūros įrankis jį atvaizduoja |
 

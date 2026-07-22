@@ -2,20 +2,38 @@
 
 [English](../README.md) · **Русский** · [Español](./README.es.md) · [Português](./README.pt.md) · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Небольшой браузерный просмотрщик карт Killing Floor (`*.rom`, Unreal Engine 2.5). Рисует мир с текстурами и позволяет летать по нему свободной камерой — без запуска тяжёлого редактора KFEd. Формат `.rom` я разобрал вручную; подробности — в [`RESEARCH.ru.md`](./RESEARCH.ru.md).
+Десктопное приложение (Windows / macOS / Linux) для просмотра карт Killing Floor (`*.rom`, Unreal Engine 2.5). Рисует мир с текстурами и позволяет летать по нему свободной камерой — без запуска тяжёлого редактора KFEd. Тот же просмотрщик работает и как одна страница `viewer.html` в браузере. Формат `.rom` я разобрал вручную; подробности — в [`RESEARCH.ru.md`](./RESEARCH.ru.md).
 
 ![Killing Floor Map Viewer](../screenshot.jpg)
 
 ## Что нужно
 
 - Установленная игра **Killing Floor** (просмотрщик читает твои собственные файлы игры: карты `.rom` и лежащие рядом пакеты `.utx`/`.usx`).
-- Свежий браузер на Chromium (Chrome / Edge) — используются File System Access (выбор папки) и расширение сжатых текстур S3TC.
+- Либо **десктопное приложение** ниже, либо свежий браузер на Chromium (Chrome / Edge) — используются выбор папки и расширение сжатых текстур S3TC.
 
 Никакого игрового контента в репозитории нет. Просмотрщик указывает на твою собственную установку игры.
 
+## Десктопное приложение (Windows / macOS / Linux)
+
+Готовые самодостаточные сборки — на странице [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases), браузер не нужен:
+
+- **Windows** — `…-setup.exe` (установщик) или `…-portable.exe` (запуск без установки).
+- **macOS** — `…-mac-x64.dmg` (Intel) или `…-mac-arm64.dmg` (Apple Silicon).
+- **Linux** — `…-linux-x64.AppImage` (запуск где угодно) или `…-linux-x64.deb`.
+
+Это тот же самый просмотрщик, обёрнутый в [Electron](https://www.electronjs.org/); управление и порядок работы такие же, как в браузерной версии ниже. Сборки без подписи, поэтому при первом запуске ОС может предупредить (Windows SmartScreen → *Подробнее → Выполнить в любом случае*; macOS → правый клик → *Открыть*).
+
+### Собрать самому
+
+```bash
+pnpm install
+pnpm start         # run the app from source
+pnpm run dist      # build installers for the current OS into dist/
+```
+
 ## Как пользоваться
 
-1. Открой `viewer.html` (двойным кликом). Работает офлайн; Three.js вложен в `vendor/`.
+1. Открой десктопное приложение — или `viewer.html` в браузере (двойным кликом). Работает офлайн; Three.js вложен в `vendor/`.
 2. Нажми **Game folder** и выбери корень установки KF (`…/common/KillingFloor`). Заранее индексируются только имена пакетов; `.utx`/`.usx` читаются по мере надобности.
 3. Нажми **Map .rom** и выбери карту (или перетащи `.rom` в окно).
 
@@ -43,6 +61,7 @@ node cli.js <map.rom> out.obj    # + export the BSP as OBJ (opens in Blender / W
 | `viewer.html` | просмотрщик (Three.js + небольшая pointer-lock/WASD камера свободного полёта) |
 | `kfrom.js` | ядро: разбор пакетов UE2.5, мировой BSP, статик-меши, террейн, текстуры (браузер и Node) |
 | `cli.js` | Node CLI: статистика и экспорт в OBJ |
+| `electron/main.js` | оболочка Electron, которая показывает `viewer.html` как десктопное приложение |
 | `vendor/three.min.js` | Three.js r136 (вложен, чтобы просмотрщик работал офлайн) |
 | `RESEARCH.ru.md` | заметки о формате `.rom` и о том, как просмотрщик его рисует |
 

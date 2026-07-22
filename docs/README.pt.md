@@ -2,20 +2,38 @@
 
 [English](../README.md) · [Русский](./README.ru.md) · [Español](./README.es.md) · **Português** · [Lietuvių](./README.lt.md) · [Polski](./README.pl.md) · [Français](./README.fr.md) · [中文](./README.zh.md) · [日本語](./README.ja.md)
 
-Um pequeno visualizador de mapas de Killing Floor que roda no navegador (`*.rom`, Unreal Engine 2.5). Ele desenha o mundo com texturas e deixa você voar por aí, sem precisar abrir o pesado editor KFEd. Eu descobri o formato `.rom` na mão; os detalhes estão em [`RESEARCH.pt.md`](./RESEARCH.pt.md).
+Um app de desktop (Windows / macOS / Linux) para visualizar mapas de Killing Floor (`*.rom`, Unreal Engine 2.5). Ele desenha o mundo com texturas e deixa você voar por aí, sem precisar abrir o pesado editor KFEd. O mesmo visualizador também roda como uma única página `viewer.html` no navegador. Eu descobri o formato `.rom` na mão; os detalhes estão em [`RESEARCH.pt.md`](./RESEARCH.pt.md).
 
 ![Visualizador de Mapas do Killing Floor](../screenshot.jpg)
 
 ## O que você precisa
 
 - Uma instalação local do jogo **Killing Floor** (o visualizador lê os seus próprios arquivos do jogo: mapas `.rom` e os pacotes `.utx`/`.usx` ao lado deles).
-- Um navegador recente baseado em Chromium (Chrome / Edge) — ele usa o seletor de pastas do File System Access e a extensão de texturas comprimidas S3TC.
+- Ou o **app de desktop** abaixo, ou um navegador recente baseado em Chromium (Chrome / Edge) — o visualizador usa o seletor de pastas e a extensão de texturas comprimidas S3TC.
 
 Nenhum conteúdo do jogo acompanha este repositório. Você aponta o visualizador para a sua própria instalação.
 
+## App de desktop (Windows / macOS / Linux)
+
+Apps pré-compilados e autossuficientes estão na página de [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) — sem precisar de navegador:
+
+- **Windows** — `…-setup.exe` (instalador) ou `…-portable.exe` (roda sem instalar).
+- **macOS** — `…-mac-x64.dmg` (Intel) ou `…-mac-arm64.dmg` (Apple Silicon).
+- **Linux** — `…-linux-x64.AppImage` (roda em qualquer lugar) ou `…-linux-x64.deb`.
+
+Eles empacotam exatamente o mesmo visualizador no [Electron](https://www.electronjs.org/); os controles e o fluxo de trabalho são idênticos aos da versão no navegador abaixo. Os builds não são assinados, então o sistema operacional pode exibir um aviso no primeiro início (Windows SmartScreen → *Mais informações → Executar assim mesmo*; macOS → clique com o botão direito → *Abrir*).
+
+### Compile você mesmo
+
+```bash
+pnpm install
+pnpm start         # run the app from source
+pnpm run dist      # build installers for the current OS into dist/
+```
+
 ## Usando o visualizador
 
-1. Abra `viewer.html` (dê um duplo-clique nele). Ele roda offline; o Three.js está incluído em `vendor/`.
+1. Abra o app de desktop, ou abra `viewer.html` em um navegador (dê um duplo-clique nele). Ele roda offline; o Three.js está incluído em `vendor/`.
 2. Clique em **Game folder** e escolha a raiz da sua instalação do KF (`…/common/KillingFloor`). Só os nomes dos pacotes são indexados de antemão; os arquivos `.utx`/`.usx` são lidos sob demanda.
 3. Clique em **Map .rom** e escolha um mapa (ou arraste um `.rom` para a janela).
 
@@ -43,6 +61,7 @@ O OBJ tem posições, faces e UVs, mas sem texturas — um jeito rápido de conf
 | `viewer.html` | o visualizador (Three.js + uma pequena câmera de voo com pointer-lock/WASD) |
 | `kfrom.js` | o núcleo: parsing de pacotes UE2.5, BSP do mundo, static meshes, terreno, texturas (navegador e Node) |
 | `cli.js` | CLI do Node: estatísticas e exportação para OBJ |
+| `electron/main.js` | shell do Electron que hospeda o `viewer.html` como um app de desktop |
 | `vendor/three.min.js` | Three.js r136 (empacotado para o visualizador funcionar offline) |
 | `RESEARCH.pt.md` | notas sobre o formato `.rom` e como o visualizador o renderiza |
 
