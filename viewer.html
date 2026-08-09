@@ -16,6 +16,7 @@
   #ui label.btn:hover, #ui button.btn:hover { background: #3182ce; }
   #ui select, #ui input[type=range] { width: 100%; box-sizing: border-box; margin-top: 4px; }
   #ui .muted { color: #8a93a0; }
+  #ui .row label { white-space: nowrap; }   /* keep a checkbox and its word together when the row wraps */
   #log { margin-top: 8px; font: 11px/1.45 ui-monospace, monospace; white-space: pre-wrap; color: #9aa4b0; max-height: 30vh; overflow: auto; }
   #hint { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(16,19,24,.85);
           padding: 6px 12px; border-radius: 6px; z-index: 5; }
@@ -27,31 +28,33 @@
 <div id="cross"></div>
 <div id="ui">
   <h1>Killing Floor Map Viewer</h1>
-  <div class="row muted">1. Pick your KillingFloor game folder. 2. Pick a map.</div>
-  <div class="row"><label class="btn">Game folder…<input id="dir" type="file" webkitdirectory directory hidden></label>
-    <span id="dirinfo" class="muted"> not set</span></div>
-  <div class="row"><label class="btn">Map .rom…<input id="map" type="file" accept=".rom" hidden></label>
+  <div class="row muted" data-i18n="ui.steps">1. Pick your KillingFloor game folder. 2. Pick a map.</div>
+  <div class="row"><label class="btn"><span data-i18n="btn.gameFolder">Game folder…</span><input id="dir" type="file" webkitdirectory directory hidden></label>
+    <span id="dirinfo" class="muted" data-i18n="info.notSet">not set</span></div>
+  <div class="row"><label class="btn"><span data-i18n="btn.mapRom">Map .rom…</span><input id="map" type="file" accept=".rom" hidden></label>
     <select id="maplist" style="display:none"></select></div>
-  <div class="row muted">You can also drag a .rom onto the window.</div>
+  <div class="row muted" data-i18n="ui.dragHint">You can also drag a .rom onto the window.</div>
   <div class="row">
-    <label><input id="wire" type="checkbox"> wireframe</label>
-    &nbsp;<label><input id="showbsp" type="checkbox" checked> BSP</label>
-    &nbsp;<label><input id="showsm" type="checkbox" checked> meshes</label>
-    &nbsp;<label><input id="showter" type="checkbox" checked> terrain</label>
-    &nbsp;<label><input id="showsky" type="checkbox" checked> sky</label>
-    &nbsp;<label><input id="showlight" type="checkbox"> light</label>
+    <label><input id="wire" type="checkbox"> <span data-i18n="chk.wireframe">wireframe</span></label>
+    &nbsp;<label><input id="showbsp" type="checkbox" checked> <span data-i18n="chk.bsp">BSP</span></label>
+    &nbsp;<label><input id="showsm" type="checkbox" checked> <span data-i18n="chk.meshes">meshes</span></label>
+    &nbsp;<label><input id="showter" type="checkbox" checked> <span data-i18n="chk.terrain">terrain</span></label>
+    &nbsp;<label><input id="showsky" type="checkbox" checked> <span data-i18n="chk.sky">sky</span></label>
+    &nbsp;<label><input id="showlight" type="checkbox"> <span data-i18n="chk.light">light</span></label>
   </div>
-  <div class="row muted">overlays:
-    <label><input id="showspawns" type="checkbox"> spawns</label>
-    &nbsp;<label><input id="showtrader" type="checkbox"> trader</label>
-    &nbsp;<label><input id="showpaths" type="checkbox"> paths</label>
+  <div class="row muted"><span data-i18n="ui.overlays">overlays:</span>
+    <label><input id="showspawns" type="checkbox"> <span data-i18n="chk.spawns">spawns</span></label>
+    &nbsp;<label><input id="showtrader" type="checkbox"> <span data-i18n="chk.trader">trader</span></label>
+    &nbsp;<label><input id="showpaths" type="checkbox"> <span data-i18n="chk.paths">paths</span></label>
   </div>
-  <div class="row"><button id="reset" class="btn">Reset view</button></div>
-  <div class="row">speed <input id="speed" type="range" min="100" max="8000" value="1500"></div>
+  <div class="row"><button id="reset" class="btn" data-i18n="btn.reset">Reset view</button></div>
+  <div class="row"><span data-i18n="ui.speed">speed</span> <input id="speed" type="range" min="100" max="8000" value="1500"></div>
+  <div class="row"><span class="muted" data-i18n="ui.language">Language</span><select id="lang"></select></div>
   <div id="log"></div>
 </div>
-<div id="hint">Click — capture mouse · WASD — move · Space/Ctrl — up/down · Shift — sprint · R — reset view · Esc — release</div>
+<div id="hint" data-i18n="hint.controls">Click — capture mouse · WASD — move · Space/Ctrl — up/down · Shift — sprint · R — reset view · Esc — release</div>
 
+<script src="i18n.js"></script>
 <script src="vendor/three.min.js"></script>
 <script src="kfrom.js"></script>
 <script>
@@ -60,6 +63,17 @@ const KF = window.KFRom, T = window.THREE;
 const logEl = document.getElementById("log");
 const log = (m) => { logEl.textContent += m + "\n"; logEl.scrollTop = logEl.scrollHeight; };
 const yield_ = () => new Promise((r) => setTimeout(r, 0));
+
+// ---- language ---------------------------------------------------------------------------------
+// Every locale the README is translated into. Switching repaints the panel at once; the choice
+// rides localStorage, which a file:// page may refuse - then it just isn't remembered. Default en.
+const I18N = window.KFI18N, t = (k, v) => I18N.t(k, v);
+const langSel = document.getElementById("lang");
+I18N.LANGS.forEach(([code, label]) => { const o = document.createElement("option"); o.value = code; o.textContent = label; langSel.appendChild(o); });
+const savedLang = (() => { try { return localStorage.getItem("kfmv.lang"); } catch (e) { return null; } })();
+langSel.value = savedLang && I18N.DICT[savedLang] ? savedLang : "en";
+langSel.addEventListener("change", () => { I18N.apply(langSel.value); try { localStorage.setItem("kfmv.lang", langSel.value); } catch (e) { /* file:// without storage */ } });
+I18N.apply(langSel.value);
 
 // PolyFlags (UE2 surface flags)
 const PF_Masked = 0x2, PF_Translucent = 0x4, PF_Modulated = 0x40;
@@ -73,7 +87,7 @@ const camera = new T.PerspectiveCamera(75, 1, 1, 2e6);
 let mapRoot = null, bspGroup = null, smGroup = null, terrainGroup = null, spawnsGroup = null, traderGroup = null, pathsGroup = null;
 let skyGroup = null, skyBasisS = null;   // sky box: child of scene, follows the camera (infinite backdrop)
 const s3tc = renderer.extensions.get("WEBGL_compressed_texture_s3tc");
-if (!s3tc) log("! no WEBGL_compressed_texture_s3tc — DXT textures will show as flat color");
+if (!s3tc) log(t("log.noS3tc"));
 
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener("resize", resize); resize();
@@ -127,14 +141,17 @@ document.getElementById("dir").addEventListener("change", (e) => {
     if (/\.(utx|usx|u|rom)$/i.test(f.name)) fileIndex.set(base, f);
     if (/\.rom$/i.test(f.name)) maps.push(f);
   }
-  document.getElementById("dirinfo").textContent = ` ${fileIndex.size} packages`;
+  I18N.setText("dirinfo", "info.packages", { n: fileIndex.size });
   const sel = document.getElementById("maplist");
   if (maps.length) {
-    sel.style.display = "block"; sel.innerHTML = '<option value="">— map from folder —</option>';
+    sel.style.display = "block"; sel.innerHTML = "";
+    const head = document.createElement("option");
+    head.value = ""; head.dataset.i18n = "opt.fromFolder"; head.textContent = t("opt.fromFolder");   // re-rendered on a language switch
+    sel.appendChild(head);
     maps.sort((a, b) => a.name.localeCompare(b.name)).forEach((f) => { const o = document.createElement("option"); o.value = f.name.toLowerCase().replace(/\.[^.]+$/, ""); o.textContent = f.name; sel.appendChild(o); });
     sel.onchange = () => { if (sel.value) loadMapFile(fileIndex.get(sel.value)); };
   }
-  log(`folder indexed: ${fileIndex.size} packages, ${maps.length} maps`);
+  log(t("log.folderIndexed", { pkgs: fileIndex.size, maps: maps.length }));
 });
 
 async function getPackage(basename) {
@@ -142,7 +159,7 @@ async function getPackage(basename) {
   if (pkgCache.has(key)) return pkgCache.get(key);
   const f = fileIndex.get(key);
   if (!f) { pkgCache.set(key, null); return null; }
-  let pkg = null; try { pkg = KF.parsePackage(new Uint8Array(await f.arrayBuffer())); pkg._key = key; } catch (err) { log(`! ${f.name}: ${err.message}`); }
+  let pkg = null; try { pkg = KF.parsePackage(new Uint8Array(await f.arrayBuffer())); pkg._key = key; } catch (err) { log(t("log.fileError", { file: f.name, error: err.message })); }
   pkgCache.set(key, pkg); return pkg;
 }
 const pkgKey = (pkg) => pkg._key || "__map__";
@@ -391,8 +408,8 @@ function pointsFromLocs(locs, color, size) {
 // ---- load a map ------------------------------------------------------------------------------
 async function loadMapFile(file) {
   if (!file) return;
-  log(`\nloading ${file.name}…`);
-  let pkg; try { pkg = KF.parsePackage(new Uint8Array(await file.arrayBuffer())); } catch (e) { log("! package: " + e.message); return; }
+  log("\n" + t("log.loading", { name: file.name }));
+  let pkg; try { pkg = KF.parsePackage(new Uint8Array(await file.arrayBuffer())); } catch (e) { log(t("log.pkgError", { error: e.message })); return; }
 
   if (mapRoot) { scene.remove(mapRoot); disposeTree(mapRoot); }
   if (skyGroup) { scene.remove(skyGroup); disposeTree(skyGroup); skyGroup = null; skyBasisS = null; }
@@ -409,7 +426,7 @@ async function loadMapFile(file) {
 
   lightOn = document.getElementById("showlight").checked;
   lights = gatherLights(pkg); lightGrid = lights.length ? buildLightGrid(lights) : null;
-  if (lights.length) log(`lights: ${lights.length}`);
+  if (lights.length) log(t("log.lights", { n: lights.length }));
 
   // BSP (+ sky box)
   const world = KF.findWorldModel(pkg);
@@ -432,13 +449,13 @@ async function loadMapFile(file) {
         skyBasisS = new T.Vector3(S[0], S[2], -S[1]);
         const skyTris = await addBspGroups(pkg, KF.buildMesh(pkg, model, (nn) => nn.zone === skyZone), skyGroup, true, null);
         skyGroup.visible = document.getElementById("showsky").checked;
-        log(`sky: zone ${skyZone}, ${skyTris} tris`);
+        log(t("log.sky", { zone: skyZone, tris: skyTris }));
       }
     }
     const groups = KF.buildMesh(pkg, model, skyZone ? ((nn) => nn.zone !== skyZone) : null);
     bspTris = await addBspGroups(pkg, groups, bspGroup, false, bump);
-    log(`BSP: ${groups.size} groups, ${bspTris} tris`);
-  } else log("no world Model (mesh-based map)");
+    log(t("log.bsp", { groups: groups.size, tris: bspTris }));
+  } else log(t("log.noWorld"));
 
   // terrain (heightmap)
   const ti = KF.readTerrainInfo(pkg);
@@ -462,7 +479,7 @@ async function loadMapFile(file) {
       if (lights.length) tmat.vertexColors = lightOn;
       terrainGroup.add(new T.Mesh(geo, tmat));
       for (let i = 0; i < w * h; i++) bump(tm.positions[i * 3], tm.positions[i * 3 + 1], tm.positions[i * 3 + 2]);
-      log(`terrain: ${w}x${h} grid, ${tm.indices.length / 3} tris`);
+      log(t("log.terrain", { w, h, tris: tm.indices.length / 3 }));
     }
   }
 
@@ -483,9 +500,9 @@ async function loadMapFile(file) {
       smGroup.add(mesh); inst++; smTris += built.geo.index.count / 3;
       bump(act.location[0], act.location[1], act.location[2]);
     }
-    if ((++i & 255) === 0) { log(`  meshes ${i}/${actors.length}…`); await yield_(); }
+    if ((++i & 255) === 0) { log(t("log.meshProgress", { i, total: actors.length })); await yield_(); }
   }
-  log(`static meshes: ${inst} instances, ${smTris | 0} tris${smMiss ? `, ${smMiss} unresolved` : ""}`);
+  log(t("log.meshes", { instances: inst, tris: smTris | 0, missing: smMiss ? t("log.meshesMissing", { n: smMiss }) : "" }));
 
   // overlays: player spawns, trader spots, monster path nodes (points only)
   const TRADER = new Set(["KFTraderTeleporter", "ShopVolume", "WeaponLocker", "KFTraderDoor"]);
@@ -500,11 +517,11 @@ async function loadMapFile(file) {
   if ((o = pointsFromLocs(spawns, 0x33dd55, 55))) spawnsGroup.add(o);
   if ((o = pointsFromLocs(trader, 0xffcc33, 65))) traderGroup.add(o);
   if ((o = pointsFromLocs(paths, 0xff5555, 40))) pathsGroup.add(o);
-  log(`overlays: ${spawns.length} spawns, ${trader.length} trader, ${paths.length} path nodes`);
+  log(t("log.overlays", { spawns: spawns.length, trader: trader.length, paths: paths.length }));
 
   scene.add(mapRoot);
   frameCamera(uMin, uMax);
-  log(`done: BSP ${bspTris} + meshes ${smTris | 0} tris`);
+  log(t("log.done", { bsp: bspTris, meshes: smTris | 0 }));
 }
 
 function frameCamera(uMin, uMax) {
@@ -522,7 +539,7 @@ function disposeTree(root) { root.traverse((o) => { if (o.geometry) o.geometry.d
 
 document.getElementById("map").addEventListener("change", (e) => { if (e.target.files[0]) loadMapFile(e.target.files[0]); });
 addEventListener("dragover", (e) => e.preventDefault());
-addEventListener("drop", (e) => { e.preventDefault(); const f = [...e.dataTransfer.files].find((f) => /\.rom$/i.test(f.name)); if (f) loadMapFile(f); else log("drop a .rom file"); });
+addEventListener("drop", (e) => { e.preventDefault(); const f = [...e.dataTransfer.files].find((f) => /\.rom$/i.test(f.name)); if (f) loadMapFile(f); else log(t("log.dropRom")); });
 </script>
 </body>
 </html>

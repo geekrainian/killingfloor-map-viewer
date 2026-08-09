@@ -19,6 +19,7 @@
   "scripts": {
     "start": "electron .",
     "cli": "node cli.js",
+    "test": "node test/i18n.test.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "release": "electron-builder --publish always",
@@ -37,6 +38,7 @@
       "electron/**/*",
       "viewer.html",
       "kfrom.js",
+      "i18n.js",
       "vendor/**/*",
       "LICENSE"
     ],
