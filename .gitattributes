@@ -1,0 +1,6 @@
+# Normalize to LF on commit (repo is LF; contributors may have core.autocrlf=true).
+* text=auto eol=lf
+
+*.jpg binary
+*.png binary
+*.ico binary
