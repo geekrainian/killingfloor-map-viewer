@@ -19,7 +19,7 @@ Hay aplicaciones precompiladas y autónomas en la página de [Releases](https://
 
 - **Windows** — `…-setup.exe` (instalador) o `…-portable.exe` (ejecutar sin instalar).
 - **macOS** — `…-mac-x64.dmg` (Intel) o `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (ejecutar en cualquier sitio) o `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (ejecutar en cualquier sitio) o `…-linux-amd64.deb`.
 
 Envuelven exactamente el mismo visor en [Electron](https://www.electronjs.org/); los controles y el flujo de trabajo son idénticos a la versión de navegador de abajo. Las compilaciones no están firmadas, así que el sistema operativo puede avisar en el primer arranque (Windows SmartScreen → *Más información → Ejecutar de todas formas*; macOS → clic derecho → *Abrir*).
 

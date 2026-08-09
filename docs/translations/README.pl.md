@@ -19,7 +19,7 @@ Gotowe, samodzielne aplikacje znajdziesz na stronie [Releases](https://github.co
 
 - **Windows** — `…-setup.exe` (instalator) lub `…-portable.exe` (uruchamiane bez instalacji).
 - **macOS** — `…-mac-x64.dmg` (Intel) lub `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (uruchamiane wszędzie) lub `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (uruchamiane wszędzie) lub `…-linux-amd64.deb`.
 
 Opakowują dokładnie tę samą przeglądarkę w [Electron](https://www.electronjs.org/); sterowanie i sposób pracy są identyczne jak w wersji przeglądarkowej poniżej. Buildy nie są podpisane, więc system może ostrzec przy pierwszym uruchomieniu (Windows SmartScreen → *Więcej informacji → Uruchom mimo to*; macOS → kliknij prawym przyciskiem → *Otwórz*).
 

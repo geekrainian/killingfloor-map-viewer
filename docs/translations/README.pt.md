@@ -19,7 +19,7 @@ Apps pré-compilados e autossuficientes estão na página de [Releases](https://
 
 - **Windows** — `…-setup.exe` (instalador) ou `…-portable.exe` (roda sem instalar).
 - **macOS** — `…-mac-x64.dmg` (Intel) ou `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (roda em qualquer lugar) ou `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (roda em qualquer lugar) ou `…-linux-amd64.deb`.
 
 Eles empacotam exatamente o mesmo visualizador no [Electron](https://www.electronjs.org/); os controles e o fluxo de trabalho são idênticos aos da versão no navegador abaixo. Os builds não são assinados, então o sistema operacional pode exibir um aviso no primeiro início (Windows SmartScreen → *Mais informações → Executar assim mesmo*; macOS → clique com o botão direito → *Abrir*).
 

@@ -19,7 +19,7 @@ Des applications précompilées et autonomes sont disponibles sur la page [Relea
 
 - **Windows** — `…-setup.exe` (installateur) ou `…-portable.exe` (à lancer sans installation).
 - **macOS** — `…-mac-x64.dmg` (Intel) ou `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (à lancer n'importe où) ou `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (à lancer n'importe où) ou `…-linux-amd64.deb`.
 
 Elles embarquent exactement le même visualiseur dans [Electron](https://www.electronjs.org/) ; les contrôles et le fonctionnement sont identiques à la version navigateur ci-dessous. Les builds ne sont pas signés, donc le système d'exploitation peut afficher un avertissement au premier lancement (Windows SmartScreen → *Informations complémentaires → Exécuter quand même* ; macOS → clic droit → *Ouvrir*).
 

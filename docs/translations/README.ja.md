@@ -19,7 +19,7 @@ Killing Floor のゲームマップ（`*.rom`、Unreal Engine 2.5）を表示す
 
 - **Windows** — `…-setup.exe`（インストーラ）または `…-portable.exe`（インストールせずに実行）。
 - **macOS** — `…-mac-x64.dmg`（Intel）または `…-mac-arm64.dmg`（Apple Silicon）。
-- **Linux** — `…-linux-x64.AppImage`（どこでも実行可能）または `…-linux-x64.deb`。
+- **Linux** — `…-linux-x86_64.AppImage`（どこでも実行可能）または `…-linux-amd64.deb`。
 
 これらは同じビューアをそのまま [Electron](https://www.electronjs.org/) でラップしたもので、操作や使い方は下記のブラウザ版とまったく同じです。ビルドには署名がないため、初回起動時に OS が警告を表示することがあります（Windows SmartScreen → *詳細情報 → 実行*、macOS → 右クリック → *開く*）。
 

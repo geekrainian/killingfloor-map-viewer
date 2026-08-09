@@ -19,7 +19,7 @@ Prebuilt, self-contained apps are on the [Releases](https://github.com/geekraini
 
 - **Windows** — `…-setup.exe` (installer) or `…-portable.exe` (run without installing).
 - **macOS** — `…-mac-x64.dmg` (Intel) or `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (run anywhere) or `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (run anywhere) or `…-linux-amd64.deb`.
 
 They wrap the exact same viewer in [Electron](https://www.electronjs.org/); the controls and workflow are identical to the browser version below. The builds are unsigned, so the OS may warn on first launch (Windows SmartScreen → *More info → Run anyway*; macOS → right-click → *Open*).
 

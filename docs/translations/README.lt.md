@@ -19,7 +19,7 @@ Iš anksto sukompiliuotos, savarankiškos programos yra [Releases](https://githu
 
 - **Windows** — `…-setup.exe` (diegimo programa) arba `…-portable.exe` (paleidžiama nediegiant).
 - **macOS** — `…-mac-x64.dmg` (Intel) arba `…-mac-arm64.dmg` (Apple Silicon).
-- **Linux** — `…-linux-x64.AppImage` (paleidžiama bet kur) arba `…-linux-x64.deb`.
+- **Linux** — `…-linux-x86_64.AppImage` (paleidžiama bet kur) arba `…-linux-amd64.deb`.
 
 Jos supakuoja lygiai tą patį peržiūros įrankį į [Electron](https://www.electronjs.org/); valdymas ir darbo eiga tokie patys kaip toliau aprašytoje naršyklės versijoje. Šie dariniai nepasirašyti, tad operacinė sistema pirmą kartą paleidžiant gali įspėti (Windows SmartScreen → *Daugiau informacijos → Vis tiek paleisti*; macOS → dešinysis pelės klavišas → *Atidaryti*).
 

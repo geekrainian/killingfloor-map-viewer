@@ -19,7 +19,7 @@
 
 - **Windows** —— `…-setup.exe`（安装程序）或 `…-portable.exe`（免安装运行）。
 - **macOS** —— `…-mac-x64.dmg`（Intel）或 `…-mac-arm64.dmg`（Apple Silicon）。
-- **Linux** —— `…-linux-x64.AppImage`（随处运行）或 `…-linux-x64.deb`。
+- **Linux** —— `…-linux-x86_64.AppImage`（随处运行）或 `…-linux-amd64.deb`。
 
 它们用 [Electron](https://www.electronjs.org/) 把完全相同的查看器封装起来；操作方式和工作流程与下方的浏览器版本完全一致。这些构建未经签名，所以操作系统在首次启动时可能会弹出警告（Windows SmartScreen → *更多信息 → 仍要运行*；macOS → 右键点击 → *打开*）。
 
