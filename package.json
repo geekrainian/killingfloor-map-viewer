@@ -29,7 +29,7 @@
   "build": {
     "appId": "com.geekrainian.killingfloormapviewer",
     "productName": "Killing Floor Map Viewer",
-    "artifactName": "Killing-Floor-Map-Viewer-${version}-${os}-${arch}.${ext}",
+    "artifactName": "KillingFloor-Map-Viewer-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -53,10 +53,10 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "Killing-Floor-Map-Viewer-${version}-${os}-${arch}-setup.${ext}"
+      "artifactName": "KillingFloor-Map-Viewer-${version}-${os}-${arch}-setup.${ext}"
     },
     "portable": {
-      "artifactName": "Killing-Floor-Map-Viewer-${version}-${os}-${arch}-portable.${ext}"
+      "artifactName": "KillingFloor-Map-Viewer-${version}-${os}-${arch}-portable.${ext}"
     },
     "mac": {
       "target": [
