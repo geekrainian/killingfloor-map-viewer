@@ -1,6 +1,6 @@
 "use strict";
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright (c) 2026 Geekrainian
+// Copyright (c) 2026 TheBestPlan
 //
 // UI translations + live language switching. English is the source and the fallback: a missing key
 // in any locale falls back to en, so a partial translation never blanks the panel.

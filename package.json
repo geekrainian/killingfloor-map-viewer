@@ -3,17 +3,17 @@
   "productName": "Killing Floor Map Viewer",
   "version": "0.1.0",
   "description": "A desktop app for viewing Killing Floor game maps (*.rom, Unreal Engine 2.5)",
-  "author": "geekrainian",
+  "author": "TheBestPlan",
   "license": "GPL-3.0-only",
   "packageManager": "pnpm@11.13.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/geekrainian/killingfloor-map-viewer.git"
+    "url": "https://github.com/TheBestPlan/killingfloor-map-viewer.git"
   },
   "funding": [
-    "https://buymeacoffee.com/geekrainian",
-    "https://ko-fi.com/geekrainian",
-    "https://liberapay.com/geekrainian"
+    "https://buymeacoffee.com/TheBestPlan",
+    "https://ko-fi.com/TheBestPlan",
+    "https://liberapay.com/TheBestPlan"
   ],
   "main": "electron/main.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "prepare": "husky"
   },
   "build": {
-    "appId": "com.geekrainian.killingfloormapviewer",
+    "appId": "com.thebestplan.killingfloormapviewer",
     "productName": "Killing Floor Map Viewer",
     "artifactName": "KillingFloor-Map-Viewer-${version}-${os}-${arch}.${ext}",
     "directories": {
@@ -81,12 +81,12 @@
       ],
       "category": "Graphics",
       "icon": "build/icon.png",
-      "maintainer": "Geekrainian"
+      "maintainer": "TheBestPlan"
     },
     "publish": [
       {
         "provider": "github",
-        "owner": "geekrainian",
+        "owner": "TheBestPlan",
         "repo": "killingfloor-map-viewer"
       }
     ]

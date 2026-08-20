@@ -15,7 +15,7 @@ No game content ships with this repo. You point the viewer at your own install.
 
 ## Desktop app (Windows / macOS / Linux)
 
-Prebuilt, self-contained apps are on the [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) page — no browser needed:
+Prebuilt, self-contained apps are on the [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) page — no browser needed:
 
 - **Windows** — `…-setup.exe` (installer) or `…-portable.exe` (run without installing).
 - **macOS** — `…-mac-x64.dmg` (Intel) or `…-mac-arm64.dmg` (Apple Silicon).

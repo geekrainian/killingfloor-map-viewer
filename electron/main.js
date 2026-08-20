@@ -1,6 +1,6 @@
 "use strict";
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright (c) 2026 Geekrainian
+// Copyright (c) 2026 TheBestPlan
 //
 // Electron shell around the browser viewer. It only hosts viewer.html in a Chromium
 // window — all rendering and file access stays in the same client code the browser uses

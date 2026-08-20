@@ -15,7 +15,7 @@ To repozytorium nie zawiera żadnych zasobów gry. Wskazujesz przeglądarce swoj
 
 ## Aplikacja desktopowa (Windows / macOS / Linux)
 
-Gotowe, samodzielne aplikacje znajdziesz na stronie [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) — bez potrzeby przeglądarki:
+Gotowe, samodzielne aplikacje znajdziesz na stronie [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) — bez potrzeby przeglądarki:
 
 - **Windows** — `…-setup.exe` (instalator) lub `…-portable.exe` (uruchamiane bez instalacji).
 - **macOS** — `…-mac-x64.dmg` (Intel) lub `…-mac-arm64.dmg` (Apple Silicon).

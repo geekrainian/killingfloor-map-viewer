@@ -1,6 +1,6 @@
 "use strict";
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright (c) 2026 Geekrainian
+// Copyright (c) 2026 TheBestPlan
 //
 // Self-test for the panel translations (the Language picker). Catches the three ways a locale rots:
 // a missing/extra key, a dropped {placeholder} (the string would render "{n}" to the user), and a

@@ -15,7 +15,7 @@ Este repositorio no incluye contenido del juego. Apuntas el visor a tu propia in
 
 ## Aplicación de escritorio (Windows / macOS / Linux)
 
-Hay aplicaciones precompiladas y autónomas en la página de [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) — sin necesidad de navegador:
+Hay aplicaciones precompiladas y autónomas en la página de [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) — sin necesidad de navegador:
 
 - **Windows** — `…-setup.exe` (instalador) o `…-portable.exe` (ejecutar sin instalar).
 - **macOS** — `…-mac-x64.dmg` (Intel) o `…-mac-arm64.dmg` (Apple Silicon).

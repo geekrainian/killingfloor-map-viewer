@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright (c) 2026 Geekrainian
+// Copyright (c) 2026 TheBestPlan
 //
 // kfrom CLI — geometry stats and Wavefront OBJ export for a KF .rom map (the Node side of kfrom.js).
 //   node cli.js <map.rom>            # print geometry stats + referenced texture packages

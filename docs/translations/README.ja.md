@@ -15,7 +15,7 @@ Killing Floor のゲームマップ（`*.rom`、Unreal Engine 2.5）を表示す
 
 ## デスクトップアプリ（Windows / macOS / Linux）
 
-ビルド済みの自己完結型アプリは [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) ページにあります。ブラウザは不要です。
+ビルド済みの自己完結型アプリは [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) ページにあります。ブラウザは不要です。
 
 - **Windows** — `…-setup.exe`（インストーラ）または `…-portable.exe`（インストールせずに実行）。
 - **macOS** — `…-mac-x64.dmg`（Intel）または `…-mac-arm64.dmg`（Apple Silicon）。

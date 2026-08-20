@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright (c) 2026 Geekrainian
+// Copyright (c) 2026 TheBestPlan
 //
 // kfrom — a reader for Killing Floor .rom/.utx/.usx packages (Unreal Engine 2.5, v128/29).
 // DataView-based, so it needs no Node Buffer; input is a Uint8Array (browser: File.arrayBuffer(),

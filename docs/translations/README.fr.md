@@ -15,7 +15,7 @@ Aucun contenu du jeu n'est fourni avec ce dépôt. Tu pointes le visualiseur ver
 
 ## Application de bureau (Windows / macOS / Linux)
 
-Des applications précompilées et autonomes sont disponibles sur la page [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) — aucun navigateur nécessaire :
+Des applications précompilées et autonomes sont disponibles sur la page [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) — aucun navigateur nécessaire :
 
 - **Windows** — `…-setup.exe` (installateur) ou `…-portable.exe` (à lancer sans installation).
 - **macOS** — `…-mac-x64.dmg` (Intel) ou `…-mac-arm64.dmg` (Apple Silicon).

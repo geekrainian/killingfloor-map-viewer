@@ -15,7 +15,7 @@
 
 ## 桌面应用（Windows / macOS / Linux）
 
-预构建的、自包含的应用可以在 [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) 页面获取——无需浏览器：
+预构建的、自包含的应用可以在 [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) 页面获取——无需浏览器：
 
 - **Windows** —— `…-setup.exe`（安装程序）或 `…-portable.exe`（免安装运行）。
 - **macOS** —— `…-mac-x64.dmg`（Intel）或 `…-mac-arm64.dmg`（Apple Silicon）。

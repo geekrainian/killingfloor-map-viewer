@@ -15,7 +15,7 @@ Su šia repozitorija joks žaidimo turinys nepateikiamas. Peržiūros įrankį n
 
 ## Darbalaukio programa (Windows / macOS / Linux)
 
-Iš anksto sukompiliuotos, savarankiškos programos yra [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases) puslapyje — naršyklės nereikia:
+Iš anksto sukompiliuotos, savarankiškos programos yra [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases) puslapyje — naršyklės nereikia:
 
 - **Windows** — `…-setup.exe` (diegimo programa) arba `…-portable.exe` (paleidžiama nediegiant).
 - **macOS** — `…-mac-x64.dmg` (Intel) arba `…-mac-arm64.dmg` (Apple Silicon).

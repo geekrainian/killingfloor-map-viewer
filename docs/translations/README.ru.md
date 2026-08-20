@@ -15,7 +15,7 @@
 
 ## Десктопное приложение (Windows / macOS / Linux)
 
-Готовые самодостаточные сборки — на странице [Releases](https://github.com/geekrainian/killingfloor-map-viewer/releases), браузер не нужен:
+Готовые самодостаточные сборки — на странице [Releases](https://github.com/TheBestPlan/killingfloor-map-viewer/releases), браузер не нужен:
 
 - **Windows** — `…-setup.exe` (установщик) или `…-portable.exe` (запуск без установки).
 - **macOS** — `…-mac-x64.dmg` (Intel) или `…-mac-arm64.dmg` (Apple Silicon).
